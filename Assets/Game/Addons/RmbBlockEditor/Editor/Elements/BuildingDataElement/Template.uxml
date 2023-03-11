@@ -53,14 +53,32 @@
             <engine:VisualElement class="splitter"/>
             <engine:Label text="Import Building Data From File" class="h3 center"/>
             <engine:VisualElement class="row pt pb">
-                <engine:Toggle name="import-props" text="Properties" value="true" class="flex-grow mr"/>
-                <engine:Toggle name="import-exterior" text="Exterior" value="true" class="flex-grow mr"/>
-                <engine:Toggle name="import-interior" text="Interior" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-props-from-file" text="Properties" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-exterior-from-file" text="Exterior" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-interior-from-file" text="Interior" value="true" class="flex-grow mr"/>
             </engine:VisualElement>
 
             <engine:VisualElement class="row pt">
                 <engine:Button name="import-from-file" text="Import" class="flex-grow mr"/>
                 <engine:Button name="cancel-replace-from-file" text="Cancel" class="flex-grow ml"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement name="replace-from-catalog-container" class="pt hidden">
+            <engine:VisualElement class="splitter"/>
+            <engine:Label text="Import Building Data From Catalog" class="h3 center"/>
+
+            <engine:VisualElement name="object-picker-container"/>
+
+            <engine:VisualElement class="row pt pb">
+                <engine:Toggle name="import-props-from-catalog" text="Properties" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-exterior-from-catalog" text="Exterior" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-interior-from-catalog" text="Interior" value="true" class="flex-grow mr"/>
+            </engine:VisualElement>
+
+            <engine:VisualElement class="row pt">
+                <engine:Button name="import-from-catalog" text="Import" class="flex-grow mr"/>
+                <engine:Button name="cancel-replace-from-catalog" text="Cancel" class="flex-grow ml"/>
             </engine:VisualElement>
         </engine:VisualElement>
 

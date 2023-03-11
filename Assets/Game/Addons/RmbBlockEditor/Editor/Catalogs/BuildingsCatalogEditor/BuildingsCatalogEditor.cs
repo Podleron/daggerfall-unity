@@ -42,7 +42,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         {
             RenderTemplate();
             InitializeCatalogItemElement();
-            InitializeBuildingDataElement();
             BindInfoButton();
             BindCatalogOperations();
             RenderPicker();
@@ -69,7 +68,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private void InitializeBuildingDataElement()
         {
             var buildingDataElement = visualElement.Query<BuildingDataElement>("building-data-element").First();
-            buildingDataElement.Change = OnChangeBuildingData;
+            buildingDataElement.changed -= OnChangeBuildingData;
+            buildingDataElement.changed += OnChangeBuildingData;
             buildingDataElement.HideCatalogImport();
         }
 
@@ -196,6 +196,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var buildingDataElement = visualElement.Query<BuildingDataElement>("building-data-element").First();
             buildingDataElement.SetData(selectedBuildingData);
 
+            InitializeBuildingDataElement();
             ShowOptionsBox();
         }
 

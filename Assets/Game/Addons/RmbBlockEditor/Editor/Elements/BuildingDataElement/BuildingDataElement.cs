@@ -19,29 +19,56 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
 {
     public class BuildingDataElement : VisualElement
     {
+        private const string WorldDataFolder = "/StreamingAssets/WorldData/";
+        private BuildingReplacementData data;
+        private Action<BuildingReplacementData> change;
+        private Action<BuildingReplacementData> changeBuildingData;
+        private Action<BuildingReplacementData> changeSubRecord;
+        private Debouncer _debouncer = new Debouncer();
+        private string selectedCatalogItem = "";
+
+        public void SetData(BuildingReplacementData data)
+        {
+            this.data = data;
+            Initialize();
+        }
+
+        public BuildingReplacementData GetData()
+        {
+            return data;
+        }
+
         public new class UxmlFactory : UxmlFactory<BuildingDataElement, UxmlTraits>
         {
         }
 
-        private const string WorldDataFolder = "/StreamingAssets/WorldData/";
-        public BuildingReplacementData Data;
-        public Action<BuildingReplacementData> Change { get; set; }
-
-        public void SetData(BuildingReplacementData data)
-        {
-            Data = data;
-            Initialize();
-        }
-
         public BuildingDataElement()
         {
+            // Register a callback to be invoked after the element has been removed
+            RegisterCallback<DetachFromPanelEvent>(evt => OnRemovedFromHierarchy());
+
             var template =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                     "Assets/Game/Addons/RmbBlockEditor/Editor/Elements/BuildingDataElement/Template.uxml");
             Add(template.CloneTree());
+        }
 
-            Initialize();
-            RegisterCallbacks();
+        public event Action<BuildingReplacementData> changed
+        {
+            add => change += value;
+            remove => change -= value;
+        }
+
+        public event Action<BuildingReplacementData> changedBuildingData
+        {
+            add => changeBuildingData += value;
+            remove => changeBuildingData -= value;
+        }
+
+        public event Action<BuildingReplacementData> changedSubRecord
+        {
+            add => changeSubRecord += value;
+            remove => changeSubRecord -= value;
         }
 
         public void HideCatalogImport()
@@ -52,6 +79,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
 
         private void Initialize()
         {
+            UnregisterCallbacks();
+
             // Get field references
             var factionIdField = this.Query<IntegerField>("faction-id").First();
             var buildingTypeField = this.Query<EnumField>("building-type").First();
@@ -59,23 +88,25 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             var qualityField = this.Query<IntegerField>("quality-input").First();
             buildingTypeField.Init(DFLocation.BuildingTypes.House1);
 
-            factionIdField.value = Data.FactionId;
-            buildingTypeField.value = (DFLocation.BuildingTypes)Data.BuildingType;
-            qualitySlider.value = Data.Quality;
-            qualityField.value = Data.Quality;
+            factionIdField.value = data.FactionId;
+            buildingTypeField.value = (DFLocation.BuildingTypes)data.BuildingType;
+            qualitySlider.value = data.Quality;
+            qualityField.value = data.Quality;
 
             // Show exterior thumbnail
             var exteriorThumb = this.Query<VisualElement>("exterior-thumbnail").First();
             exteriorThumb.Clear();
-            exteriorThumb.Add(BuildingPreset.GetExteriorPreview(Data));
+            exteriorThumb.Add(BuildingPreset.GetExteriorPreview(data));
 
             // Show interior thumbnail
             var interiorThumb = this.Query<VisualElement>("interior-thumbnail").First();
             interiorThumb.Clear();
-            interiorThumb.Add(BuildingPreset.GetInteriorPreview(Data));
+            interiorThumb.Add(BuildingPreset.GetInteriorPreview(data));
 
             // Set the containers visibility
             HideReplaceFromFile();
+
+            RegisterCallbacks();
         }
 
         private void RegisterCallbacks()
@@ -86,58 +117,82 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             var qualitySlider = this.Query<SliderInt>("quality").First();
             var qualityField = this.Query<IntegerField>("quality-input").First();
             var replaceFromFileButton = this.Query<Button>("replace-from-file-button").First();
-            var replaceFromCatalogButton = this.Query<Button>("replace-from-catalog-button").First();
             var importFromFile = this.Query<Button>("import-from-file").First();
             var cancelReplaceFromFile = this.Query<Button>("cancel-replace-from-file").First();
+            var replaceFromCatalogButton = this.Query<Button>("replace-from-catalog-button").First();
+            var importFromCatalog = this.Query<Button>("import-from-catalog").First();
+            var cancelReplaceFromCatalog = this.Query<Button>("cancel-replace-from-catalog").First();
 
             // Register field callbacks
             factionIdField.RegisterCallback<ChangeEvent<int>>(evt =>
             {
                 var factionId = ((IntegerField)evt.currentTarget).value;
-                Data.FactionId = (byte)factionId;
-                Change?.Invoke(Data);
-            });
-            buildingTypeField.RegisterCallback<ChangeEvent<EnumField>>(evt =>
+                data.FactionId = (byte)factionId;
+                changeBuildingData?.Invoke(data);
+                change?.Invoke(data);
+            }, TrickleDown.TrickleDown);
+            buildingTypeField.RegisterCallback<ChangeEvent<Enum>>(evt =>
             {
                 var buildingType = ((EnumField)evt.currentTarget).value;
-                Data.BuildingType = Convert.ToInt32(buildingType);
-                Change?.Invoke(Data);
-            });
+                data.BuildingType = Convert.ToInt32(buildingType);
+                changeBuildingData?.Invoke(data);
+                change?.Invoke(data);
+            }, TrickleDown.TrickleDown);
             qualitySlider.RegisterCallback<ChangeEvent<int>>(evt =>
             {
                 var quality = ((SliderInt)evt.currentTarget).value;
                 qualityField.value = quality;
-                Data.Quality = (byte)quality;
-                Change?.Invoke(Data);
-            });
+            }, TrickleDown.TrickleDown);
             qualityField.RegisterCallback<ChangeEvent<int>>(evt =>
             {
                 var quality = ((IntegerField)evt.currentTarget).value;
-                Data.Quality = (byte)quality;
-                Change?.Invoke(Data);
-            });
+                data.Quality = (byte)quality;
+                changeBuildingData?.Invoke(data);
+                change?.Invoke(data);
+            }, TrickleDown.TrickleDown);
 
             // Register button callbacks
-            replaceFromFileButton.clicked += () =>
-            {
-                ShowReplaceFromFile();
-            };
-
-            importFromFile.clicked += () =>
-            {
-                OnImportBuilding();
-            };
-
-            cancelReplaceFromFile.clicked += () =>
-            {
-                HideReplaceFromFile();
-            };
+            replaceFromFileButton.clicked += ShowReplaceFromFile;
+            replaceFromCatalogButton.clicked += ShowReplaceFromCatalog;
+            importFromFile.clicked += OnImportFromFile;
+            cancelReplaceFromFile.clicked += HideReplaceFromFile;
+            importFromCatalog.clicked += OnImportFromCatalog;
+            cancelReplaceFromCatalog.clicked += HideReplaceFromCatalog;
         }
 
         private void ShowReplaceFromFile()
         {
+            // Show replaceFromFileContainer
             var replaceFromFileContainer = this.Query<VisualElement>("replace-from-file-container").First();
             replaceFromFileContainer.RemoveFromClassList("hidden");
+
+            // Get reference to importButton and scrollView
+            var importButton = this.Query<Button>("import-from-file").First();
+            var scrollView = importButton.GetFirstAncestorOfType<ScrollView>();
+
+            // Give the hidden container time to repaint, so the scrollView can calculate the height correctly
+            _debouncer.Debounce(async () => { scrollView.ScrollTo(importButton); }, 10);
+        }
+
+        private void ShowReplaceFromCatalog()
+        {
+            // Show replaceFromFileContainer
+            var replaceFromCatalogContainer = this.Query<VisualElement>("replace-from-catalog-container").First();
+            replaceFromCatalogContainer.RemoveFromClassList("hidden");
+
+            // Show the object picker
+            var objectPickerContainer = this.Query<VisualElement>("object-picker-container").First();
+            objectPickerContainer.Clear();
+            var catalog = PersistedBuildingsCatalog.List();
+            var pickerObject = new ObjectPicker2(catalog, OnCatalogItemSelected, GetPreview);
+            objectPickerContainer.Add(pickerObject.visualElement);
+
+            // Get reference to importButton and scrollView
+            var importButton = this.Query<Button>("import-from-catalog").First();
+            var scrollView = importButton.GetFirstAncestorOfType<ScrollView>();
+
+            // Give the hidden container time to repaint, so the scrollView can calculate the height correctly
+            _debouncer.Debounce(async () => { scrollView.ScrollTo(importButton); }, 10);
         }
 
         private void HideReplaceFromFile()
@@ -146,35 +201,81 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             replaceFromFileContainer.AddToClassList("hidden");
         }
 
-        private void OnImportBuilding()
+        private void HideReplaceFromCatalog()
         {
-            var importProps = this.Query<Toggle>("import-props").First();
-            var importExterior = this.Query<Toggle>("import-exterior").First();
-            var importInterior = this.Query<Toggle>("import-interior").First();
+            var replaceFromCatalogContainer = this.Query<VisualElement>("replace-from-catalog-container").First();
+            replaceFromCatalogContainer.AddToClassList("hidden");
+        }
+
+        private void OnImportFromFile()
+        {
+            var importProps = this.Query<Toggle>("import-props-from-file").First();
+            var importExterior = this.Query<Toggle>("import-exterior-from-file").First();
+            var importInterior = this.Query<Toggle>("import-interior-from-file").First();
 
             var loadedData = new BuildingReplacementData();
             var success = LoadBuildingFile(ref loadedData);
             if (!success) return;
 
-            if (importProps.value)
+            Import(loadedData, importProps.value, importExterior.value, importInterior.value);
+        }
+
+        private void OnImportFromCatalog()
+        {
+            var templates = PersistedBuildingsCatalog.Templates();
+
+            var importProps = this.Query<Toggle>("import-props-from-catalog").First();
+            var importExterior = this.Query<Toggle>("import-exterior-from-catalog").First();
+            var importInterior = this.Query<Toggle>("import-interior-from-catalog").First();
+
+            var buildingData = templates[selectedCatalogItem];
+            Import(buildingData, importProps.value, importExterior.value, importInterior.value);
+        }
+
+        private void Import(BuildingReplacementData replacementData, bool importProps, bool importExterior,
+            bool importInterior)
+        {
+            if (!importProps && !importExterior && !importInterior)
             {
-                Data.FactionId = loadedData.FactionId;
-                Data.BuildingType = loadedData.BuildingType;
-                Data.Quality = loadedData.Quality;
+                return;
             }
 
-            if (importExterior.value)
+            if (importProps)
             {
-                Data.RmbSubRecord.Exterior = loadedData.RmbSubRecord.Exterior;
+                data.FactionId = replacementData.FactionId;
+                data.BuildingType = replacementData.BuildingType;
+                data.Quality = replacementData.Quality;
+                changeBuildingData?.Invoke(data);
             }
 
-            if (importInterior.value)
+            if (importExterior)
             {
-                Data.RmbSubRecord.Interior = loadedData.RmbSubRecord.Interior;
+                data.RmbSubRecord.Exterior = replacementData.RmbSubRecord.Exterior;
             }
 
-            Change?.Invoke(Data);
+            if (importInterior)
+            {
+                data.RmbSubRecord.Interior = replacementData.RmbSubRecord.Interior;
+            }
+
+            if (importExterior || importInterior)
+            {
+                changeSubRecord?.Invoke(data);
+            }
+
+            change?.Invoke(data);
             Initialize();
+        }
+
+        private void OnCatalogItemSelected(string objectId)
+        {
+            selectedCatalogItem = objectId;
+        }
+
+        private VisualElement GetPreview(string buildingId)
+        {
+            var templates = PersistedBuildingsCatalog.Templates();
+            return BuildingPreset.GetPreview(templates[buildingId]);
         }
 
         private Boolean LoadBuildingFile(ref BuildingReplacementData buildingData)
@@ -196,6 +297,31 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             {
                 return false;
             }
+        }
+
+        private void UnregisterCallbacks()
+        {
+            changeBuildingData = null;
+            changeSubRecord = null;
+            change = null;
+            var replaceFromFileButton = this.Query<Button>("replace-from-file-button").First();
+            var replaceFromCatalogButton = this.Query<Button>("replace-from-catalog-button").First();
+            var importFromFile = this.Query<Button>("import-from-file").First();
+            var cancelReplaceFromFile = this.Query<Button>("cancel-replace-from-file").First();
+            var importFromCatalog = this.Query<Button>("import-from-catalog").First();
+            var cancelReplaceFromCatalog = this.Query<Button>("cancel-replace-from-catalog").First();
+
+            replaceFromFileButton.clicked -= ShowReplaceFromFile;
+            replaceFromCatalogButton.clicked -= ShowReplaceFromCatalog;
+            importFromFile.clicked -= OnImportFromFile;
+            cancelReplaceFromFile.clicked -= HideReplaceFromFile;
+            importFromCatalog.clicked -= OnImportFromCatalog;
+            cancelReplaceFromCatalog.clicked -= HideReplaceFromCatalog;
+        }
+
+        private void OnRemovedFromHierarchy()
+        {
+            UnregisterCallbacks();
         }
     }
 }

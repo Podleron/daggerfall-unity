@@ -211,8 +211,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var buildingObject = Selection.activeGameObject.GetComponent<Building>();
             if (buildingObject)
             {
-                contentContainer.Add(BuildingEditor.Render(buildingObject.gameObject, OnModifyBuilding,
-                    OnExportBuilding));
+                var buildingEditor = new BuildingEditor2(buildingObject);
+                contentContainer.Add(buildingEditor);
+                // contentContainer.Add(BuildingEditor.Render(buildingObject.gameObject, OnModifyBuilding,
+                //     OnExportBuilding));
                 return;
             }
 
