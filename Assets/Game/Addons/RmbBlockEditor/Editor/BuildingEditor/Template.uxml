@@ -4,6 +4,8 @@
     xmlns:engine="UnityEngine.UIElements"
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements"
+    xmlns:rbe="DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements"
 >
     <engine:VisualElement class="row pl pr pt">
         <engine:VisualElement class="col-2"/>

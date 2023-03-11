@@ -1,5 +1,6 @@
 ﻿using System;
 using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets;
+using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements;
 using DaggerfallWorkshop.Utility.AssetInjection;
 using UnityEditor;
 using UnityEngine;
@@ -11,17 +12,13 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
     {
         private const string WorldDataFolder = "/StreamingAssets/WorldData/";
         private VisualElement visualElement;
-        private BuildingPreset buildingHelper;
         private BuildingReplacementData building;
-        private Preview preview;
         private Action<BuildingReplacementData, Boolean, Boolean> onModify;
 
-        public ModifyBuildingFromFile(BuildingPreset buildingHelper, Action<BuildingReplacementData, Boolean, Boolean> onModify)
+        public ModifyBuildingFromFile(Action<BuildingReplacementData, Boolean, Boolean> onModify)
         {
             visualElement = new VisualElement();
-            this.buildingHelper = buildingHelper;
             this.onModify = onModify;
-            preview = Preview.GetPreview();
             RenderTemplate();
             RenderFileLoader();
         }
@@ -79,8 +76,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
                 // Show the preview
                 var element = visualElement.Query<VisualElement>("file-preview").First();
-                var previewGameObject = buildingHelper.AddBuildingPlaceholder(building.RmbSubRecord);
-                preview.Render(element, previewGameObject);
+                var previewGameObject = BuildingPreset.AddBuildingPlaceholder(building.RmbSubRecord);
+                var preview = new GoPreview(previewGameObject);
+                element.Clear();
+                element.Add(preview);
             }
             catch (ArgumentException e)
             {

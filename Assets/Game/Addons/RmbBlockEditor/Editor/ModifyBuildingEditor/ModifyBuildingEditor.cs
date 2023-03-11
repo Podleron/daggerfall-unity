@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets;
+using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements;
 using DaggerfallWorkshop.Utility.AssetInjection;
 using UnityEditor;
 using UnityEngine;
@@ -19,17 +20,16 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
     public class ModifyBuildingEditor
     {
         private readonly VisualElement visualElement;
-        private readonly BuildingPreset buildingHelper;
         private readonly ModifyBuildingFromFile modifyBuildingFromFile;
         private string objectId;
-        private ObjectPicker pickerObject;
+        private ObjectPicker2 pickerObject;
         private readonly GameObject oldGo;
+        private List<CatalogItem> catalog = PersistedBuildingsCatalog.List();
 
         public ModifyBuildingEditor(GameObject oldGo)
         {
             visualElement = new VisualElement();
-            buildingHelper = new BuildingPreset();
-            modifyBuildingFromFile = new ModifyBuildingFromFile(buildingHelper, Modify);
+            modifyBuildingFromFile = new ModifyBuildingFromFile(Modify);
             this.oldGo = oldGo;
 
             RenderTemplate();
@@ -40,6 +40,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         public VisualElement Render()
         {
+            catalog = PersistedBuildingsCatalog.List();
+            RenderObjectPicker();
             return visualElement;
         }
 
@@ -89,23 +91,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private void RenderObjectPicker()
         {
             var modelPicker = visualElement.Query<VisualElement>("object-picker").First();
-            var categories = new Dictionary<string, Dictionary<string, string>>
-            {
-                { "Houses", BuildingPresetData.houses },
-                { "Shops", BuildingPresetData.shops },
-                { "Services", BuildingPresetData.services },
-                { "Guilds", BuildingPresetData.guilds },
-                { "Others", BuildingPresetData.others },
-            };
+            modelPicker.Clear();
 
-            if (pickerObject != null)
-            {
-                pickerObject.Destroy();
-            }
-
-            pickerObject =
-                new ObjectPicker(categories, BuildingPresetData.buildingGroups,
-                    true, OnItemSelected, AddPreview);
+            pickerObject = new ObjectPicker2(catalog, OnItemSelected, GetPreview, objectId);
             modelPicker.Add(pickerObject.visualElement);
         }
 
@@ -115,27 +103,20 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var exterior = visualElement.Query<Toggle>("exterior").First();
 
             var button = visualElement.Query<Button>("apply-modification").First();
-            button.RegisterCallback<MouseUpEvent>(evt =>
-            {
-                Modify(objectId, interior.value, exterior.value);
-                if (pickerObject != null)
-                {
-                    pickerObject.Destroy();
-                }
-            });
+            button.RegisterCallback<MouseUpEvent>(evt => { Modify(objectId, interior.value, exterior.value); });
         }
 
         private void Modify(string buildingId, Boolean interior, Boolean exterior)
         {
             var currentBuilding = oldGo.GetComponent<Building>();
-            var newGo = buildingHelper.ReplaceBuildingObject(buildingId, currentBuilding, interior, exterior);
+            var newGo = BuildingPreset.ReplaceBuildingObject(buildingId, currentBuilding, interior, exterior);
             Modify(newGo);
         }
 
         private void Modify(BuildingReplacementData building, Boolean interior, Boolean exterior)
         {
             var currentBuilding = oldGo.GetComponent<Building>();
-            var newGo = buildingHelper.ReplaceBuildingObject(building, currentBuilding, interior, exterior);
+            var newGo = BuildingPreset.ReplaceBuildingObject(building, currentBuilding, interior, exterior);
             Modify(newGo);
         }
 
@@ -160,10 +141,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             objectId = buildingId;
         }
 
-        private GameObject AddPreview(string buildingId)
+        private VisualElement GetPreview(string buildingId)
         {
-            var previewObject = buildingHelper.AddBuildingPlaceholder(buildingId);
-            return previewObject;
+            var previewObject = BuildingPreset.AddBuildingPlaceholder(buildingId);
+            return new GoPreview(previewObject);
         }
     }
 }

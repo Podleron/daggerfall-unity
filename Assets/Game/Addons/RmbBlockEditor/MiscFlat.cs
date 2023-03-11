@@ -14,6 +14,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
     #if UNITY_EDITOR
     [ExecuteInEditMode]
+    [SelectionBase]
     public class MiscFlat : MonoBehaviour
     {
         public long Position;
@@ -25,13 +26,11 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         public Vector3 WorldPosition;
         public Vector3 OldWorldPosition;
 
-        private DFBlock.RmbBlockFlatObjectRecord data;
         private Billboard dfBillboard;
         private Vector3 flatOffset;
 
         public void CreateObject(DFBlock.RmbBlockFlatObjectRecord data)
         {
-            this.data = data;
             dfBillboard = GetComponent<Billboard>();
             flatOffset = new Vector3(0, (dfBillboard.Summary.Size.y / 2) - 0.1f, 0);
 

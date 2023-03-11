@@ -17,10 +17,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private Editor previewEditor;
         private ObjectPainter painterObject;
 
-        public AddBuildingFromFile(BuildingPreset buildingHelper)
+        public AddBuildingFromFile()
         {
             visualElement = new VisualElement();
-            this.buildingHelper = buildingHelper;
             previewGameObject = null;
             RenderTemplate();
             RenderFileLoader();
@@ -111,7 +110,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private GameObject AddPreview()
         {
-            return buildingHelper.AddBuildingPlaceholder(building.RmbSubRecord);
+            return BuildingPreset.AddBuildingPlaceholder(building.RmbSubRecord);
         }
 
         private void AddBuildingObject(Vector3 position, Vector3 rotation)
@@ -128,7 +127,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void AddBuildingObject(BuildingReplacementData building, Vector3 position, Vector3 rotation)
         {
-            var gameObject = buildingHelper.AddBuildingObject(building, position, rotation);
+            var gameObject = BuildingPreset.AddBuildingObject(building, position, rotation);
 
             var buildingsRoot = GameObject.Find("Buildings");
             gameObject.transform.parent = buildingsRoot.transform;

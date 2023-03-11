@@ -8,104 +8,61 @@
 using System;
 using System.IO;
 using DaggerfallConnect;
+using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements;
 using DaggerfallWorkshop.Game.Serialization;
 using DaggerfallWorkshop.Utility.AssetInjection;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
 {
     public class BuildingPreset
     {
-        private readonly DFBlock house1;
-        private readonly DFBlock house2;
-        private readonly DFBlock house3;
-        private readonly DFBlock house4;
-        private readonly DFBlock house5;
-        private readonly DFBlock house6;
-        private readonly DFBlock houseForSale;
-        private readonly DFBlock tavern;
-        private readonly DFBlock guildHall;
-        private readonly DFBlock temple;
-        private readonly DFBlock furnitureStore;
-        private readonly DFBlock bank;
-        private readonly DFBlock generalStore;
-        private readonly DFBlock pawnShop;
-        private readonly DFBlock armorer;
-        private readonly DFBlock weaponSmith;
-        private readonly DFBlock clothingStore;
-        private readonly DFBlock alchemist;
-        private readonly DFBlock gemStore;
-        private readonly DFBlock bookseller;
-        private readonly DFBlock library;
-        private readonly DFBlock palace;
-        private readonly DFBlock town23;
-        private readonly DFBlock ship;
+        private static readonly DFBlock house1 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("House1.json"));
+        private static readonly DFBlock house2 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("House2.json"));
+        private static readonly DFBlock house3 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("House3.json"));
+        private static readonly DFBlock house4 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("House4.json"));
+        private static readonly DFBlock house5 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("House5.json"));
+        private static readonly DFBlock house6 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("House6.json"));
+        private static readonly DFBlock houseForSale = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("HouseForSale.json"));
+        private static readonly DFBlock tavern = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Tavern.json"));
+        private static readonly DFBlock guildHall = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("GuildHall.json"));
+        private static readonly DFBlock temple = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Temple.json"));
+        private static readonly DFBlock furnitureStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("FurnitureStore.json"));
+        private static readonly DFBlock bank = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Bank.json"));
+        private static readonly DFBlock generalStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("GeneralStore.json"));
+        private static readonly DFBlock pawnShop = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("PawnShop.json"));
+        private static readonly DFBlock armorer = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Armorer.json"));
+        private static readonly DFBlock weaponSmith = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("WeaponSmith.json"));
+        private static readonly DFBlock clothingStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("ClothingStore.json"));
+        private static readonly DFBlock alchemist = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Alchemist.json"));
+        private static readonly DFBlock gemStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("GemStore.json"));
+        private static readonly DFBlock bookseller = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Bookseller.json"));
+        private static readonly DFBlock library = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Library.json"));
+        private static readonly DFBlock palace = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Palace.json"));
+        private static readonly DFBlock town23 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Town23.json"));
+        private static readonly DFBlock ship = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), GetFile("Ship.json"));
 
-        private ClimateBases climate;
-        private ClimateSeason season;
-        private WindowStyle windowStyle;
-
-        public BuildingPreset()
+        public static BuildingReplacementData GetBuildingData(string buildingId)
         {
-            var house1File = GetFile("House1.json");
-            var house2File = GetFile("House2.json");
-            var house3File = GetFile("House3.json");
-            var house4File = GetFile("House4.json");
-            var house5File = GetFile("House5.json");
-            var house6File = GetFile("House6.json");
-            var houseForSaleFile = GetFile("HouseForSale.json");
-            var tavernFile = GetFile("Tavern.json");
-            var guildHallFile = GetFile("GuildHall.json");
-            var templeFile = GetFile("Temple.json");
-            var furnitureStoreFile = GetFile("FurnitureStore.json");
-            var bankFile = GetFile("Bank.json");
-            var generalStoreFile = GetFile("GeneralStore.json");
-            var pawnShopFile = GetFile("PawnShop.json");
-            var armorerFile = GetFile("Armorer.json");
-            var weaponSmithFile = GetFile("WeaponSmith.json");
-            var clothingStoreFile = GetFile("ClothingStore.json");
-            var alchemistFile = GetFile("Alchemist.json");
-            var gemStoreFile = GetFile("GemStore.json");
-            var booksellerFile = GetFile("Bookseller.json");
-            var libraryFile = GetFile("Library.json");
-            var palaceFile = GetFile("Palace.json");
-            var town23File = GetFile("Town23.json");
-            var shipFile = GetFile("Ship.json");
+            var buildingGroupId = int.Parse(buildingId.Substring(0, 2));
+            var buildingIndex = int.Parse(buildingId.Substring(2));
+            DFBlock buildingGroup = GetBuildingGroup(buildingGroupId);
+            DFLocation.BuildingData buildingData = buildingGroup.RmbBlock.FldHeader.BuildingDataList[buildingIndex - 1];
+            DFBlock.RmbSubRecord subRecord =
+                RmbBlockHelper.CloneRmbSubRecord(buildingGroup.RmbBlock.SubRecords[buildingIndex - 1]);
 
-            house1 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), house1File);
-            house2 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), house2File);
-            house3 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), house3File);
-            house4 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), house4File);
-            house5 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), house5File);
-            house6 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), house6File);
-            houseForSale = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), houseForSaleFile);
-            tavern = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), tavernFile);
-            guildHall = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), guildHallFile);
-            temple = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), templeFile);
-            furnitureStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), furnitureStoreFile);
-            bank = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), bankFile);
-            generalStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), generalStoreFile);
-            pawnShop = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), pawnShopFile);
-            armorer = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), armorerFile);
-            weaponSmith = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), weaponSmithFile);
-            clothingStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), clothingStoreFile);
-            alchemist = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), alchemistFile);
-            gemStore = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), gemStoreFile);
-            bookseller = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), booksellerFile);
-            library = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), libraryFile);
-            palace = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), palaceFile);
-            town23 = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), town23File);
-            ship = (DFBlock)SaveLoadManager.Deserialize(typeof(DFBlock), shipFile);
+            return new BuildingReplacementData
+            {
+                FactionId = buildingData.FactionId,
+                Quality = buildingData.Quality,
+                BuildingType = (int)buildingData.BuildingType,
+                NameSeed = buildingData.NameSeed,
+                RmbSubRecord = subRecord
+            };
         }
 
-        public void SetClimate(ClimateBases climate, ClimateSeason season, WindowStyle windowStyle)
-        {
-            this.climate = climate;
-            this.season = season;
-            this.windowStyle = windowStyle;
-        }
-
-        public GameObject AddBuildingObject(BuildingReplacementData building, Vector3 position, Vector3 rotation)
+        public static GameObject AddBuildingObject(BuildingReplacementData building, Vector3 position, Vector3 rotation)
         {
             DFLocation.BuildingData buildingData = new DFLocation.BuildingData()
             {
@@ -131,7 +88,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
             return go;
         }
 
-        public GameObject AddBuildingObject(string buildingId, Vector3 position, Vector3 rotation)
+        public static GameObject AddBuildingObject(string buildingId, Vector3 position, Vector3 rotation)
         {
             var buildingGroupId = int.Parse(buildingId.Substring(0, 2));
             var buildingIndex = int.Parse(buildingId.Substring(2));
@@ -157,7 +114,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
             return go;
         }
 
-        public GameObject ReplaceBuildingObject(BuildingReplacementData building, Building oldBuilding,
+        public static GameObject ReplaceBuildingObject(BuildingReplacementData building, Building oldBuilding,
             Boolean useNewInterior, Boolean useNewExterior)
         {
             var oldSubRecord = oldBuilding.GetSubRecord();
@@ -197,7 +154,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
             return go;
         }
 
-        public GameObject ReplaceBuildingObject(string buildingId, Building oldBuilding, Boolean useNewInterior,
+        public static GameObject ReplaceBuildingObject(string buildingId, Building oldBuilding, Boolean useNewInterior,
             Boolean useNewExterior)
         {
             var buildingGroupId = int.Parse(buildingId.Substring(0, 2));
@@ -245,7 +202,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
         }
 
         // Unlike in AddBuildingObject, we do not want to add the Building Component to this GameObject
-        public GameObject AddBuildingPlaceholder(string buildingId)
+        public static GameObject AddBuildingPlaceholder(string buildingId)
         {
             var buildingGroupId = int.Parse(buildingId.Substring(0, 2));
             var buildingIndex = int.Parse(buildingId.Substring(2));
@@ -256,7 +213,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
             return AddBuildingPlaceholder(subRecord);
         }
 
-        public GameObject AddBuildingPlaceholder(DFBlock.RmbSubRecord subRecord)
+        public static GameObject AddBuildingPlaceholder(DFBlock.RmbSubRecord subRecord)
         {
             var placeholder = new GameObject();
             foreach (var blockRecord in subRecord.Exterior.Block3dObjectRecords)
@@ -268,7 +225,84 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets
             return placeholder;
         }
 
-        private DFBlock GetBuildingGroup(int buildingGroupId)
+        public static GameObject GetExteriorPlaceholder(BuildingReplacementData buildingReplacementData)
+        {
+            var placeholder = new GameObject();
+            if (buildingReplacementData.RmbSubRecord.Exterior.Block3dObjectRecords == null)
+            {
+                return placeholder;
+            }
+            foreach (var blockRecord in buildingReplacementData.RmbSubRecord.Exterior.Block3dObjectRecords)
+            {
+                var go = RmbBlockHelper.Add3dObject(blockRecord);
+                go.transform.parent = placeholder.transform;
+            }
+
+            return placeholder;
+        }
+
+        public static GameObject GetInteriorPlaceholder(BuildingReplacementData buildingReplacementData)
+        {
+            var placeholder = new GameObject();
+            if (buildingReplacementData.RmbSubRecord.Interior.Block3dObjectRecords == null)
+            {
+                return placeholder;
+            }
+            foreach (var blockRecord in buildingReplacementData.RmbSubRecord.Interior.Block3dObjectRecords)
+            {
+                var go = RmbBlockHelper.Add3dObject(blockRecord);
+                go.transform.parent = placeholder.transform;
+            }
+
+            return placeholder;
+        }
+
+        public static VisualElement GetPreview(BuildingReplacementData buildingData)
+        {
+            var tabs = new Tabs();
+            var tab1 = new Tab { value = 0, label = "Exterior" };
+            var tab2 = new Tab { value = 1, label = "Interior" };
+
+            var exteriorPreview = GetExteriorPreview(buildingData);
+            var interiorPreview = GetInteriorPreview(buildingData);
+
+            tab1.Add(exteriorPreview);
+            tab2.Add(interiorPreview);
+            tabs.Add(tab1);
+            tabs.Add(tab2);
+
+            return tabs;
+        }
+
+        public static VisualElement GetInteriorPreview(BuildingReplacementData buildingData)
+        {
+            try
+            {
+                var interior = GetInteriorPlaceholder(buildingData);
+                return new GoPreview(interior);
+            }
+            catch (Exception e)
+            {
+                // The building might not have an Interior
+                return new VisualElement();
+            }
+        }
+
+        public static VisualElement GetExteriorPreview(BuildingReplacementData buildingData)
+        {
+            try
+            {
+                var exterior = GetExteriorPlaceholder(buildingData);
+                return new GoPreview(exterior);
+            }
+            catch (Exception e)
+            {
+                // The building might not have an Exterior
+                return new VisualElement();
+            }
+        }
+
+        private static DFBlock GetBuildingGroup(int buildingGroupId)
         {
             DFBlock buildingGroup = new DFBlock();
             switch (buildingGroupId)

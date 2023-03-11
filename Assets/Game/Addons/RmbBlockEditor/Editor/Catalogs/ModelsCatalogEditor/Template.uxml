@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+>
+    <engine:VisualElement class="row center pr pt pb">
+            <engine:Label text="Models Catalog Editor" class="h1 shrink"/>
+            <engine:Button name="catalog-info" text="?" class="shrink"/>
+    </engine:VisualElement>
+
+    <engine:Box class= "ml mb mr mt pt pb pl pr">
+        <engine:VisualElement class="row pr pb">
+            <engine:Label text="Catalog actions:" class="col-4 h3"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pt">
+            <engine:Button name="import" text="Import Catalog" class="col-2"/>
+            <engine:Button name="export" text="Export Catalog" class="col-2"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pt">
+            <engine:Button name="remove-all" text="Remove All Models" class="col-2"/>
+            <engine:Button name="scan" text="Scan For Models" class="col-2"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pt pb">
+            <engine:Button name="restore-defaults" text="Restore Default Catalog" class="col-2"/>
+        </engine:VisualElement>
+    </engine:Box>
+
+    <engine:VisualElement name="object-picker" usage-hints="GroupTransform" class="pb"/>
+
+    <engine:Box name="options-box" class= "ml mb mr mt pt pb pl pr hidden">
+        <engine:VisualElement class="row pr pb">
+            <engine:TextField readonly="true" label="ID" name="id" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <engine:TextField label="Label" name="label" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <engine:TextField label="Category" name="category" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <engine:TextField label="Subcategory" name="subcategory" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <engine:TextField label="Tags" name="tags" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <engine:Button name="save-item" text="Save" class="col-2"/>
+            <engine:Button name="remove-item" text="Remove" class="col-2"/>
+        </engine:VisualElement>
+    </engine:Box>
+
+    <engine:Button name="execute-script" text="Execute Script"/>
+</engine:UXML>

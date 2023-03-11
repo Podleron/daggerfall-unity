@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using DaggerfallConnect;
-using DaggerfallWorkshop.Game.Utility.WorldDataEditor;
+using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,15 +17,14 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
     public class Add3d
     {
-        private VisualElement visualElement;
-        private string objectId;
+        private VisualElement visualElement = new VisualElement();
+        private string objectId = "";
         private ObjectPainter painterObject;
-        private ObjectPicker pickerObject;
+        private ObjectPicker2 pickerObject;
+        private List<CatalogItem> catalog = PersistedModelsCatalog.List();
 
         public Add3d()
         {
-            visualElement = new VisualElement();
-            objectId = "";
             RenderTemplate();
             RenderObjectPicker();
             RenderPainter();
@@ -33,6 +32,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         public VisualElement Render()
         {
+            catalog = PersistedModelsCatalog.List();
+            RenderObjectPicker();
             return visualElement;
         }
 
@@ -47,29 +48,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private void RenderObjectPicker()
         {
             var modelPicker = visualElement.Query<VisualElement>("object-picker").First();
-            var categories = new Dictionary<string, Dictionary<string, string>>
-            {
-                { "Furniture", WorldDataEditorObjectData.models_furniture },
-                { "Clutter", WorldDataEditorObjectData.models_clutter },
-                { "Structure", WorldDataEditorObjectData.models_structure },
-                { "Graveyard", WorldDataEditorObjectData.models_graveyard },
-                { "HouseParts", WorldDataEditorObjectData.houseParts },
-                { "Dungeon", WorldDataEditorObjectData.models_dungeon },
-                { "Dungeon Rooms", WorldDataEditorObjectData.dungeonParts_rooms },
-                { "Dungeon Corridors", WorldDataEditorObjectData.dungeonParts_corridors },
-                { "Dungeon Misc", WorldDataEditorObjectData.dungeonParts_misc },
-                { "Dungeon Caves", WorldDataEditorObjectData.dungeonParts_caves },
-                { "Dungeon Doors", WorldDataEditorObjectData.dungeonParts_doors },
-            };
-
-            if (pickerObject != null)
-            {
-                pickerObject.Destroy();
-            }
+            modelPicker.Clear();
 
             pickerObject =
-                new ObjectPicker(categories, WorldDataEditorObjectData.modelGroups,
-                    true, OnItemSelected, AddPreview);
+                new ObjectPicker2(catalog, OnItemSelected, GetPreview, objectId);
             modelPicker.Add(pickerObject.visualElement);
         }
 
@@ -98,13 +80,13 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private GameObject AddPlaceholder()
         {
-            return AddPreview(objectId);
+            return RmbBlockHelper.Add3dObject(objectId);
         }
 
-        private GameObject AddPreview(string modelId)
+        private VisualElement GetPreview(string modelId)
         {
             var previewObject = RmbBlockHelper.Add3dObject(modelId);
-            return previewObject;
+            return new GoPreview(previewObject);
         }
 
         private void AddModel(Vector3 position, Vector3 rotation, Vector3 scale)
@@ -148,10 +130,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             if (painterObject != null)
             {
                 painterObject.Destroy();
-            }
-            if (pickerObject != null)
-            {
-                pickerObject.Destroy();
             }
         }
     }

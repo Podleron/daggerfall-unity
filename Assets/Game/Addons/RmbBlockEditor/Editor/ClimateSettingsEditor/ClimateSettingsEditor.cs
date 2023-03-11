@@ -13,12 +13,12 @@ using UnityEditor.UIElements;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
-    public class SettingsEditor
+    public class ClimateSettingsEditor
     {
         private VisualElement visualElement;
         private GameObject go;
 
-        public SettingsEditor()
+        public ClimateSettingsEditor()
         {
             visualElement = new VisualElement();
         }
@@ -37,7 +37,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             visualElement.Clear();
             var rmbPropsTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/Game/Addons/RmbBlockEditor/Editor/SettingsEditor/Template.uxml");
+                    "Assets/Game/Addons/RmbBlockEditor/Editor/ClimateSettingsEditor/Template.uxml");
             visualElement.Add(rmbPropsTree.CloneTree());
         }
 

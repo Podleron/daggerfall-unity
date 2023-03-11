@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using DaggerfallConnect;
+using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements;
 using DaggerfallWorkshop.Game.Utility.WorldDataEditor;
 using UnityEditor;
 using UnityEngine;
@@ -17,15 +18,15 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
     public class AddFlat
     {
-        private VisualElement visualElement;
-        private string objectId;
+        private VisualElement visualElement = new VisualElement();
+        private string objectId = "";
         private ObjectPainter painterObject;
-        private ObjectPicker pickerObject;
+        private ObjectPicker2 pickerObject;
+        private List<CatalogItem> catalog;
 
         public AddFlat()
         {
-            visualElement = new VisualElement();
-            objectId = "";
+            catalog = PersistedFlatsCatalog.List();
             RenderTemplate();
             RenderObjectPicker();
             RenderPainter();
@@ -33,6 +34,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         public VisualElement Render()
         {
+            catalog = PersistedFlatsCatalog.List();
+            RenderObjectPicker();
             return visualElement;
         }
 
@@ -46,25 +49,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void RenderObjectPicker()
         {
-            var modelPicker = visualElement.Query<VisualElement>("object-picker").First();
-            var categories = new Dictionary<string, Dictionary<string, string>>
-            {
-                { "Interior", WorldDataEditorObjectData.billboards_interior },
-                { "Exterior", WorldDataEditorObjectData.billboards_nature },
-                { "Lights", WorldDataEditorObjectData.billboards_lights },
-                { "Dungeon", WorldDataEditorObjectData.billboards_treasure },
-                { "Npc", WorldDataEditorObjectData.NPCs },
-            };
-
-            if (pickerObject != null)
-            {
-                pickerObject.Destroy();
-            }
+            var pickerElement = visualElement.Query<VisualElement>("object-picker").First();
+            pickerElement.Clear();
 
             pickerObject =
-                new ObjectPicker(categories, WorldDataEditorObjectData.flatGroups,
-                    true, OnItemSelected, RmbBlockHelper.AddFlatObject);
-            modelPicker.Add(pickerObject.visualElement);
+                new ObjectPicker2(catalog, OnItemSelected, GetPreview, objectId);
+            pickerElement.Add(pickerObject.visualElement);
         }
 
         private void RenderPainter()
@@ -121,15 +111,17 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             gameObject.transform.parent = miscFlatRoot.transform;
         }
 
+        private VisualElement GetPreview(string id)
+        {
+            var go = RmbBlockHelper.AddFlatObject(id);
+            return new GoPreview(go);
+        }
+
         public void Destroy()
         {
             if (painterObject != null)
             {
                 painterObject.Destroy();
-            }
-            if (pickerObject != null)
-            {
-                pickerObject.Destroy();
             }
         }
     }

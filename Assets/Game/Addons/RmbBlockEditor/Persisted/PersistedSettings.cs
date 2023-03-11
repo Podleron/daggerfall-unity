@@ -9,7 +9,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
     public class PersistedSettings
     {
         private const string SettingsDirectory = "/Editor/Settings/RmbBlockEditor/";
-        private const string SettingsFileName = "settings.txt";
+        private const string SettingsFileName = "settings.json";
         private string directoryPath;
         private string filePath;
 

@@ -12,9 +12,9 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using DaggerfallConnect;
+using DaggerfallWorkshop.Game.Utility.ModSupport;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
@@ -36,7 +36,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private Add3d add3dElement;
         private AddFlat addFlat;
 
-        private SettingsEditor settingsEditor;
+        private ClimateSettingsEditor climateSettingsEditor;
+        private ModelsCatalogEditor modelsCatalogEditor;
+        private FlatsCatalogEditor flatsCatalogEditor;
+        private BuildingsCatalogEditor buildingsCatalogEditor;
 
         private bool keepViewOnSelectionChange;
 
@@ -49,6 +52,11 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void OnEnable()
         {
+            PersistedSettings.Load();
+            PersistedModelsCatalog.Load();
+            PersistedFlatsCatalog.Load();
+            PersistedBuildingsCatalog.Load();
+
             var original =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                     "Assets/Game/Addons/RmbBlockEditor/Editor/RmbBlockEditorWindowTemplate.uxml");
@@ -64,10 +72,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             addBuilding = new AddBuilding();
             add3dElement = new Add3d();
             addFlat = new AddFlat();
-            settingsEditor = new SettingsEditor();
+            climateSettingsEditor = new ClimateSettingsEditor();
+            modelsCatalogEditor = new ModelsCatalogEditor();
+            flatsCatalogEditor = new FlatsCatalogEditor();
+            buildingsCatalogEditor = new BuildingsCatalogEditor();
             keepViewOnSelectionChange = false;
 
-            PersistedSettings.Load();
             RenderMenus();
         }
 
@@ -241,8 +251,35 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 Selection.SetActiveObjectWithContext(null, null);
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
-                contentContainer.Add(settingsEditor.Render(root));
+                contentContainer.Add(climateSettingsEditor.Render(root));
             }, (action) => SetMenuStatus(action));
+
+            fileMenu.menu.AppendAction("Settings/Catalogs/Models", action =>
+            {
+                keepViewOnSelectionChange = true;
+                Selection.SetActiveObjectWithContext(null, null);
+                var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
+                contentContainer.Clear();
+                contentContainer.Add(modelsCatalogEditor.Render());
+            });
+
+            fileMenu.menu.AppendAction("Settings/Catalogs/Flats", action =>
+            {
+                keepViewOnSelectionChange = true;
+                Selection.SetActiveObjectWithContext(null, null);
+                var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
+                contentContainer.Clear();
+                contentContainer.Add(flatsCatalogEditor.Render());
+            });
+
+            fileMenu.menu.AppendAction("Settings/Catalogs/Buildings", action =>
+            {
+                keepViewOnSelectionChange = true;
+                Selection.SetActiveObjectWithContext(null, null);
+                var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
+                contentContainer.Clear();
+                contentContainer.Add(buildingsCatalogEditor.Render());
+            });
 
             var editMenu = rootVisualElement.Query<ToolbarMenu>("rmb-edit-menu").First();
             editMenu.menu.AppendAction("Block Properties",
@@ -269,14 +306,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var addMenu = rootVisualElement.Query<ToolbarMenu>("rmb-add-menu").First();
             addMenu.menu.AppendAction("Buildings", action =>
             {
-                var rmbBlockObject = root.GetComponent<RmbBlockObject>();
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
                 contentContainer.Add(addBuilding.Render());
             }, (action) => SetMenuStatus(action));
             addMenu.menu.AppendAction("Models", action =>
             {
-                var rmbBlockObject = root.GetComponent<RmbBlockObject>();
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
                 contentContainer.Add(add3dElement.Render());

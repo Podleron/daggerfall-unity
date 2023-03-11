@@ -4,29 +4,22 @@
     xmlns:engine="UnityEngine.UIElements"
     xsi:noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd"
 >
-
-    <engine:VisualElement class="row pl pr pt pb">
-        <engine:Label text="Enter object ID manually" class="h3"/>
-    </engine:VisualElement>
-    <engine:VisualElement class="row pl pr pt pb">
-        <engine:Label text="Object ID:" class="flex-shrink"/>
-            <engine:TextField name="object-id" class="flex-grow"/>
-    </engine:VisualElement>
-
-    <engine:VisualElement class="row pl pr pt pb">
-        <engine:Label text="Or pick an item from the list" class="h3"/>
-    </engine:VisualElement>
     <engine:VisualElement class="row pl pr">
-        <engine:VisualElement name="model-list" class="col-2">
-            <engine:VisualElement name="search-container" class="row pr pt pb hidden">
-                <engine:Label text="Search: " class="flex-shrink"/>
+        <engine:Box class="col-2">
+            <engine:VisualElement class="row pl pr pt pb">
+                <engine:Label text="Object ID: " class="flex-shrink"/>
+                <engine:TextField name="object-id" class="flex-grow"/>
+            </engine:VisualElement>
+            <engine:VisualElement class="row pl pr pt pb">
+                <engine:Label text="Search:    " class="flex-shrink"/>
                 <engine:TextField name="search" class="flex-grow"/>
             </engine:VisualElement>
-            <engine:ScrollView name="list-container" class="height-450"/>
-        </engine:VisualElement>
-        <engine:VisualElement name="preview" class="col-2 pt"/>
+            <engine:ScrollView name="list-container" class="pl height-400"/>
+        </engine:Box>
+        <engine:Box class="col-2 height-425 mr overflow-hidden">
+            <engine:VisualElement name="preview"/>
+        </engine:Box>
     </engine:VisualElement>
-
 
 
 </engine:UXML>

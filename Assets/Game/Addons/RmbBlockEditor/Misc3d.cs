@@ -18,7 +18,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
     [SelectionBase]
     public class Misc3d : MonoBehaviour
     {
-        public DFBlock.RmbBlock3dObjectRecord data;
         public uint ModelId;
         public byte ObjectType;
 
@@ -32,7 +31,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         public void CreateObject(DFBlock.RmbBlock3dObjectRecord data)
         {
-            this.data = data;
             ModelId = data.ModelIdNum;
             ObjectType = data.ObjectType;
             pos = new Vector3(data.XPos, data.YPos, data.ZPos);
@@ -69,23 +67,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             return record;
         }
 
-        private void Save()
-        {
-            data.XPos = (int)pos.x;
-            data.YPos = (int)pos.y;
-            data.ZPos = (int)pos.z;
-            data.XRotation = (short)rotation.x;
-            data.YRotation = (short)rotation.y;
-            data.ZRotation = (short)rotation.z;
-            data.XScale = scale;
-            data.YScale = scale;
-            data.ZScale = scale;
-        }
-
         private void Update()
         {
             UpdateTransform();
-            Save();
         }
 
         private void OnSceneGUI(SceneView sceneView)

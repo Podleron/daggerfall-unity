@@ -8,7 +8,6 @@
     <engine:VisualElement class="row pl pr pt">
             <engine:Label text="Model ID: " class="col-1"/>
             <engine:Label name="model-id" class="col-2" />
-            <engine:Button name="modify-model" class="col-1" text="Modify" />
     </engine:VisualElement>
 
     <engine:VisualElement class="row pl pr pt">
@@ -46,6 +45,24 @@
         </engine:VisualElement>
     </engine:VisualElement>
 
-    <engine:VisualElement name="picker-container" />
+    <engine:Box name="options-box" class= "ml mb mr mt pt pb pl pr">
+        <engine:VisualElement class="row pr pb center">
+            <engine:Label name="model-subcategory" class="col-4"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pb center">
+            <engine:Button name="previous-model" class="col-1" text='←' />
+            <engine:Label name="model-id-in-subcategory" class="col-2" />
+            <engine:Button name="next-model" class="col-1" text="→" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="splitter" />
+
+        <engine:VisualElement class="row pr pb center">
+            <engine:Label text="Choose a new model from the catalog:" class="col-4"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pb center">
+            <engine:Button name="modify-model" class="col-1" text="Modify" />
+        </engine:VisualElement>
+    </engine:Box>
 
 </engine:UXML>

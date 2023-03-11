@@ -16,6 +16,7 @@ using DaggerfallWorkshop.Utility;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
+#if UNITY_EDITOR
     public static class RmbBlockHelper
     {
         private const byte InteractiveObject = 3;
@@ -475,4 +476,5 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             return cloned;
         }
     }
+#endif
 }

@@ -8,7 +8,6 @@
     <engine:VisualElement class="row pl pt">
         <engine:Label text="Position: " class="col-1"/>
         <engine:Label name="position" class="col-2"/>
-        <engine:Button name="modify-model" class="col-1" text="Modify"/>
     </engine:VisualElement>
     <engine:VisualElement class="row pl">
         <engine:Label text="TextureArchive: " class="col-1"/>
@@ -37,5 +36,25 @@
             <editor:Vector3Field name="world-position" label="Position: " class="col-4"/>
         </engine:VisualElement>
     </engine:VisualElement>
+
+    <engine:Box name="options-box" class= "ml mb mr mt pt pb pl pr">
+        <engine:VisualElement class="row pr pb center">
+            <engine:Label name="flat-subcategory" class="col-4"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pb center">
+            <engine:Button name="previous-flat" class="col-1" text='←' />
+            <engine:Label name="flat-id-in-subcategory" class="col-2" />
+            <engine:Button name="next-flat" class="col-1" text="→" />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="splitter" />
+
+        <engine:VisualElement class="row pr pb center">
+            <engine:Label text="Choose a new flat from the catalog:" class="col-4"/>
+        </engine:VisualElement>
+        <engine:VisualElement class="row pr pb center">
+            <engine:Button name="modify-flat" class="col-1" text="Modify" />
+        </engine:VisualElement>
+    </engine:Box>
 
 </engine:UXML>

@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+>
+    <engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <editor:IntegerField label="FactionId: " name="faction-id" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pr pb">
+            <editor:EnumField label="Building Type: " name="building-type" class="col-4"/>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pb">
+            <engine:SliderInt
+                name="quality"
+                label="Quality:"
+                high-value="20"
+                class="flex-grow"
+            />
+            <editor:IntegerField
+                name="quality-input"
+                readonly="true"
+                class="flex-grow"
+            />
+        </engine:VisualElement>
+
+        <engine:VisualElement class="splitter"/>
+
+        <engine:VisualElement class="row pt" style="justify-content: flex-end">
+            <engine:Button name="replace-from-catalog-button" tooltip="Replace Building Data From Catalog">
+                <engine:Image class="catalog-icon"/>
+            </engine:Button>
+            <engine:Button name="replace-from-file-button" tooltip="Replace Building Data From File">
+                <engine:Image class="import-icon"/>
+            </engine:Button>
+        </engine:VisualElement>
+
+        <engine:VisualElement class="row pt" style="align-items: flex-start">
+            <engine:VisualElement class="flex-grow" style="align-items: center">
+                <engine:Label text="Exterior:" class="shrink"/>
+                <engine:VisualElement name="exterior-thumbnail" class="thumbnail"/>
+            </engine:VisualElement>
+            <engine:VisualElement class="flex-grow" style="align-items: center">
+                <engine:Label text="Interior:" class="shrink"/>
+                <engine:VisualElement name="interior-thumbnail" class="thumbnail"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+        <engine:VisualElement name="replace-from-file-container" class="pt hidden">
+            <engine:VisualElement class="splitter"/>
+            <engine:Label text="Import Building Data From File" class="h3 center"/>
+            <engine:VisualElement class="row pt pb">
+                <engine:Toggle name="import-props" text="Properties" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-exterior" text="Exterior" value="true" class="flex-grow mr"/>
+                <engine:Toggle name="import-interior" text="Interior" value="true" class="flex-grow mr"/>
+            </engine:VisualElement>
+
+            <engine:VisualElement class="row pt">
+                <engine:Button name="import-from-file" text="Import" class="flex-grow mr"/>
+                <engine:Button name="cancel-replace-from-file" text="Cancel" class="flex-grow ml"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+    </engine:VisualElement>
+</engine:UXML>
