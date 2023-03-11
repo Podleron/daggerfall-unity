@@ -138,14 +138,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             selectedBuilding.Export(path);
         }
 
-        private void OnModifyBuilding()
-        {
-            var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
-            contentContainer.Clear();
-            var modifyBuildingEditor = new ModifyBuildingEditor(Selection.activeGameObject);
-            contentContainer.Add(modifyBuildingEditor.Render());
-        }
-
         private void OnSelectionChange()
         {
             DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
@@ -211,10 +203,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var buildingObject = Selection.activeGameObject.GetComponent<Building>();
             if (buildingObject)
             {
-                var buildingEditor = new BuildingEditor2(buildingObject);
+                var buildingEditor = new BuildingEditor(buildingObject);
                 contentContainer.Add(buildingEditor);
-                // contentContainer.Add(BuildingEditor.Render(buildingObject.gameObject, OnModifyBuilding,
-                //     OnExportBuilding));
                 return;
             }
 

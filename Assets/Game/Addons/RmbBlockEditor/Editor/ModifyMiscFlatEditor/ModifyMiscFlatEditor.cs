@@ -20,7 +20,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
     {
         private VisualElement visualElement;
         private string objectId;
-        private ObjectPicker2 pickerObject;
+        private ObjectPicker pickerObject;
         private readonly GameObject oldGo;
         private List<CatalogItem> catalog;
 
@@ -56,7 +56,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             modelPicker.Clear();
 
             pickerObject =
-                new ObjectPicker2(catalog, OnItemSelected, GetPreview, objectId);
+                new ObjectPicker(catalog, OnItemSelected, GetPreview, objectId);
             modelPicker.Add(pickerObject.visualElement);
         }
 

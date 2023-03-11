@@ -8,7 +8,6 @@
 using System;
 using System.IO;
 using DaggerfallConnect;
-using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.BuildingPresets;
 using DaggerfallWorkshop.Utility.AssetInjection;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEditor;
@@ -96,12 +95,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             // Show exterior thumbnail
             var exteriorThumb = this.Query<VisualElement>("exterior-thumbnail").First();
             exteriorThumb.Clear();
-            exteriorThumb.Add(BuildingPreset.GetExteriorPreview(data));
+            exteriorThumb.Add(BuildingHelper.GetExteriorPreview(data));
 
             // Show interior thumbnail
             var interiorThumb = this.Query<VisualElement>("interior-thumbnail").First();
             interiorThumb.Clear();
-            interiorThumb.Add(BuildingPreset.GetInteriorPreview(data));
+            interiorThumb.Add(BuildingHelper.GetInteriorPreview(data));
 
             // Set the containers visibility
             HideReplaceFromFile();
@@ -162,6 +161,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
 
         private void ShowReplaceFromFile()
         {
+            // Hide the replace from catalog container
+            HideReplaceFromCatalog();
+
             // Show replaceFromFileContainer
             var replaceFromFileContainer = this.Query<VisualElement>("replace-from-file-container").First();
             replaceFromFileContainer.RemoveFromClassList("hidden");
@@ -176,6 +178,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
 
         private void ShowReplaceFromCatalog()
         {
+            // Hide the replace from file container
+            HideReplaceFromFile();
+
             // Show replaceFromFileContainer
             var replaceFromCatalogContainer = this.Query<VisualElement>("replace-from-catalog-container").First();
             replaceFromCatalogContainer.RemoveFromClassList("hidden");
@@ -184,7 +189,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             var objectPickerContainer = this.Query<VisualElement>("object-picker-container").First();
             objectPickerContainer.Clear();
             var catalog = PersistedBuildingsCatalog.List();
-            var pickerObject = new ObjectPicker2(catalog, OnCatalogItemSelected, GetPreview);
+            var pickerObject = new ObjectPicker(catalog, OnCatalogItemSelected, GetPreview);
             objectPickerContainer.Add(pickerObject.visualElement);
 
             // Get reference to importButton and scrollView
@@ -275,7 +280,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
         private VisualElement GetPreview(string buildingId)
         {
             var templates = PersistedBuildingsCatalog.Templates();
-            return BuildingPreset.GetPreview(templates[buildingId]);
+            return BuildingHelper.GetPreview(templates[buildingId]);
         }
 
         private Boolean LoadBuildingFile(ref BuildingReplacementData buildingData)
