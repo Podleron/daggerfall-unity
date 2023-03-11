@@ -3,7 +3,7 @@
     xmlns:engine="UnityEngine.UIElements"
     xmlns:editor="UnityEditor.UIElements"
 >
-    <engine:VisualElement>
+    <engine:VisualElement class="pb mb">
 
         <engine:VisualElement class="row pr pb">
             <editor:IntegerField label="FactionId: " name="faction-id" class="col-4"/>
@@ -38,15 +38,13 @@
             </engine:Button>
         </engine:VisualElement>
 
-        <engine:VisualElement class="row pt" style="align-items: flex-start">
-            <engine:VisualElement class="flex-grow" style="align-items: center">
-                <engine:Label text="Exterior:" class="shrink"/>
-                <engine:VisualElement name="exterior-thumbnail" class="thumbnail"/>
-            </engine:VisualElement>
-            <engine:VisualElement class="flex-grow" style="align-items: center">
-                <engine:Label text="Interior:" class="shrink"/>
-                <engine:VisualElement name="interior-thumbnail" class="thumbnail"/>
-            </engine:VisualElement>
+        <engine:VisualElement class="row pt mr ml pr">
+            <engine:Box class="flex-grow">
+                <engine:VisualElement name="exterior-thumbnail" />
+            </engine:Box>
+            <engine:Box class="flex-grow">
+                <engine:VisualElement name="interior-thumbnail" />
+            </engine:Box>
         </engine:VisualElement>
 
         <engine:VisualElement name="replace-from-file-container" class="pt hidden">
@@ -68,15 +66,15 @@
             <engine:VisualElement class="splitter"/>
             <engine:Label text="Import Building Data From Catalog" class="h3 center"/>
 
-            <engine:VisualElement name="object-picker-container"/>
+            <engine:VisualElement name="object-picker-container" class="mb"/>
 
-            <engine:VisualElement class="row pt pb">
+            <engine:VisualElement class="row ml mr mt pt pb">
                 <engine:Toggle name="import-props-from-catalog" text="Properties" value="true" class="flex-grow mr"/>
                 <engine:Toggle name="import-exterior-from-catalog" text="Exterior" value="true" class="flex-grow mr"/>
                 <engine:Toggle name="import-interior-from-catalog" text="Interior" value="true" class="flex-grow mr"/>
             </engine:VisualElement>
 
-            <engine:VisualElement class="row pt">
+            <engine:VisualElement class="row ml mr pt">
                 <engine:Button name="import-from-catalog" text="Import" class="flex-grow mr"/>
                 <engine:Button name="cancel-replace-from-catalog" text="Cancel" class="flex-grow ml"/>
             </engine:VisualElement>
