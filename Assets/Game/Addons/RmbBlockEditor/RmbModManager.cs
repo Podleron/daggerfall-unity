@@ -82,7 +82,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             foreach (string file in Directory.EnumerateFiles(
                          Path.Combine(Application.dataPath, "StreamingAssets", "Mods"), "*.dfmod"))
             {
-                Debug.Log("LoadPackagedMods");
                 AssetBundle bundle = AssetBundle.LoadFromFile(file);
                 if (bundle == null)
                     continue;

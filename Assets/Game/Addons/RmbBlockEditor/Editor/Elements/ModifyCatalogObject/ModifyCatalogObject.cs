@@ -20,7 +20,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
         private Action OnPreviousDelegate;
         private Action OnNextDelegate;
         private Action OnShowCatalogDelegate;
-        private bool pickerInstantiated = false;
+        private bool pickerInstantiated;
 
         public event Action<string> changed
         {

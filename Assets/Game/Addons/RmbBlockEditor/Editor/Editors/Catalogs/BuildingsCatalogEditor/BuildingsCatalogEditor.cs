@@ -18,11 +18,10 @@ using Debug = UnityEngine.Debug;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
-    public class BuildingsCatalogEditor
+    public class BuildingsCatalogEditor: VisualElement
     {
         private const string WorldDataFolder = "/StreamingAssets/WorldData/";
         private const string exportFile = "BuildingsCatalogExport";
-        private VisualElement visualElement;
         private ObjectPicker picker;
         private PersistedBuildingsCatalog catalog;
         private string objectId;
@@ -32,39 +31,36 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         public BuildingsCatalogEditor()
         {
-            visualElement = new VisualElement();
             catalog = PersistedBuildingsCatalog.Get();
-        }
-
-        public VisualElement Render()
-        {
             RenderTemplate();
             InitializeCatalogItemElement();
             BindInfoButton();
             BindCatalogOperations();
             RenderPicker();
-            return visualElement;
         }
 
         private void RenderTemplate()
         {
-            visualElement.Clear();
+            Clear();
+            // Register a callback to be invoked after the element has been removed
+            RegisterCallback<DetachFromPanelEvent>(evt => OnRemovedFromHierarchy());
+
             var tree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                     "Assets/Game/Addons/RmbBlockEditor/Editor/Editors/Catalogs/BuildingsCatalogEditor/Template.uxml");
-            visualElement.Add(tree.CloneTree());
+            Add(tree.CloneTree());
         }
 
         private void InitializeCatalogItemElement()
         {
-            var catalogItemElement = visualElement.Query<CatalogItemElement>("catalog-item-element").First();
-            catalogItemElement.SubmitItem = OnSaveItem;
-            catalogItemElement.RemoveItem = OnRemoveItem;
+            var catalogItemElement = this.Query<CatalogItemElement>("catalog-item-element").First();
+            catalogItemElement.OnSaveItem += OnSaveItem;
+            catalogItemElement.OnRemoveItem += OnRemoveItem;
         }
 
         private void InitializeBuildingDataElement()
         {
-            var buildingDataElement = visualElement.Query<BuildingDataElement>("building-data-element").First();
+            var buildingDataElement = this.Query<BuildingDataElement>("building-data-element").First();
             buildingDataElement.changed -= OnChangeBuildingData;
             buildingDataElement.changed += OnChangeBuildingData;
             buildingDataElement.HideCatalogImport();
@@ -72,7 +68,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void BindInfoButton()
         {
-            var infoButton = visualElement.Query<Button>("catalog-info").First();
+            var infoButton = this.Query<Button>("catalog-info").First();
             infoButton.RegisterCallback<MouseUpEvent>(evt => EditorUtility.DisplayDialog("Buildings Catalog Editor",
                 "Here you can see the catalog of buildings that you can use in the RMB block editor, when adding or modifying buildings in the scene. " +
                 "\n\nThis screen lets you change what buildings are included by importing catalog files or by editing the items by hand. " +
@@ -82,11 +78,11 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void BindCatalogOperations()
         {
-            var import = visualElement.Query<Button>("import").First();
-            var export = visualElement.Query<Button>("export").First();
-            var removeAll = visualElement.Query<Button>("remove-all").First();
-            var restoreDefaults = visualElement.Query<Button>("restore-defaults").First();
-            var addNew = visualElement.Query<Button>("add-new").First();
+            var import = this.Query<Button>("import").First();
+            var export = this.Query<Button>("export").First();
+            var removeAll = this.Query<Button>("remove-all").First();
+            var restoreDefaults = this.Query<Button>("restore-defaults").First();
+            var addNew = this.Query<Button>("add-new").First();
 
             import.RegisterCallback<MouseUpEvent>(OnImportCatalog, TrickleDown.TrickleDown);
             export.RegisterCallback<MouseUpEvent>(evt => { SaveFile(); }, TrickleDown.TrickleDown);
@@ -97,7 +93,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void RenderPicker()
         {
-            var pickerElement = visualElement.Query<VisualElement>("object-picker").First();
+            var pickerElement = this.Query<VisualElement>("object-picker").First();
             pickerElement.Clear();
             if (catalog == null)
             {
@@ -125,10 +121,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 selectedBuildingData = new BuildingReplacementData();
             }
 
-            var catalogItemElement = visualElement.Query<CatalogItemElement>("catalog-item-element").First();
+            var catalogItemElement = this.Query<CatalogItemElement>("catalog-item-element").First();
             catalogItemElement.SetItem(selectedItem);
 
-            var buildingDataElement = visualElement.Query<BuildingDataElement>("building-data-element").First();
+            var buildingDataElement = this.Query<BuildingDataElement>("building-data-element").First();
             buildingDataElement.SetData(selectedBuildingData);
 
             InitializeBuildingDataElement();
@@ -222,9 +218,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void OnSaveItem(CatalogItem newItem)
         {
-            var factionId = visualElement.Query<IntegerField>("faction-id").First();
-            var buildingType = visualElement.Query<EnumField>("building-type").First();
-            var quality = visualElement.Query<SliderInt>("quality").First();
+            var factionId = this.Query<IntegerField>("faction-id").First();
+            var buildingType = this.Query<EnumField>("building-type").First();
+            var quality = this.Query<SliderInt>("quality").First();
             selectedBuildingData.FactionId = (ushort)factionId.value;
             selectedBuildingData.BuildingType = Convert.ToInt32(buildingType.value);
             selectedBuildingData.Quality = (byte)quality.value;
@@ -283,13 +279,13 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void ShowOptionsBox()
         {
-            var optionsBox = visualElement.Query<VisualElement>("options-box").First();
+            var optionsBox = this.Query<VisualElement>("options-box").First();
             optionsBox.RemoveFromClassList("hidden");
         }
 
         private void HideOptionsBox()
         {
-            var optionsBox = visualElement.Query<VisualElement>("options-box").First();
+            var optionsBox = this.Query<VisualElement>("options-box").First();
             optionsBox.AddToClassList("hidden");
         }
 
@@ -341,6 +337,16 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var path = EditorUtility.SaveFilePanel("Save", WorldDataFolder, exportFile, "json");
             File.WriteAllText(path, fileContent);
             OnItemDeseleted();
+        }
+
+        private void OnRemovedFromHierarchy()
+        {
+            var catalogItemElement = this.Query<CatalogItemElement>("catalog-item-element").First();
+            catalogItemElement.OnSaveItem -= OnSaveItem;
+            catalogItemElement.OnRemoveItem -= OnRemoveItem;
+
+            var buildingDataElement = this.Query<BuildingDataElement>("building-data-element").First();
+            buildingDataElement.changed -= OnChangeBuildingData;
         }
     }
 }

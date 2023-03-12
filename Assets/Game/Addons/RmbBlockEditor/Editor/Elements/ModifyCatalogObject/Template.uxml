@@ -4,7 +4,7 @@
         <engine:VisualElement class="row pr pb center">
             <engine:Label name="subcategory" class="col-4"/>
         </engine:VisualElement>
-        <engine:VisualElement class="row pr pb center">
+        <engine:VisualElement class="row pl pr pb center">
             <engine:Button name="previous" class="col-1" text='←'/>
             <engine:Label name="item-id-in-subcategory" class="col-2"/>
             <engine:Button name="next" class="col-1" text="→"/>

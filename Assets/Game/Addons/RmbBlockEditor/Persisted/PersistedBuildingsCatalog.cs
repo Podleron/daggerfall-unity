@@ -15,7 +15,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private string CatalogFile =
             $"{Application.dataPath}/Editor/Settings/RmbBlockEditor/buildings-catalog.json";
         private string DefaultCatalog =
-            $"{Environment.CurrentDirectory}/Assets/Game/Addons/RmbBlockEditor/Editor/Catalogs/BuildingsCatalogEditor/DefaultBuildingsCatalog.json";
+            $"{Environment.CurrentDirectory}/Assets/Game/Addons/RmbBlockEditor/Persisted/DefaultBuildingsCatalog.json";
 
         [JsonProperty] public List<CatalogItem> list;
         [JsonProperty] public Dictionary<string, BuildingReplacementData> templates;

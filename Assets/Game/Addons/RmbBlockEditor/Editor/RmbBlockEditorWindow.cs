@@ -37,9 +37,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private AddFlat addFlat;
 
         private ClimateSettingsEditor climateSettingsEditor;
-        private ModelsCatalogEditor modelsCatalogEditor;
-        private FlatsCatalogEditor flatsCatalogEditor;
-        private BuildingsCatalogEditor buildingsCatalogEditor;
 
         private bool keepViewOnSelectionChange;
 
@@ -73,9 +70,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             add3dElement = new Add3d();
             addFlat = new AddFlat();
             climateSettingsEditor = new ClimateSettingsEditor();
-            modelsCatalogEditor = new ModelsCatalogEditor();
-            flatsCatalogEditor = new FlatsCatalogEditor();
-            buildingsCatalogEditor = new BuildingsCatalogEditor();
             keepViewOnSelectionChange = false;
 
             RenderMenus();
@@ -215,7 +209,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 Selection.SetActiveObjectWithContext(null, null);
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
-                contentContainer.Add(modelsCatalogEditor.Render());
+                var modelsCatalogEditor = new CatalogEditor(PersistedModelsCatalog.Get(), ModelsHelper.GetPreview,
+                    RMBModManager.GetCustomCatalogModels);
+
+                contentContainer.Add(modelsCatalogEditor);
             });
 
             fileMenu.menu.AppendAction("Settings/Catalogs/Flats", action =>
@@ -224,7 +221,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 Selection.SetActiveObjectWithContext(null, null);
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
-                contentContainer.Add(flatsCatalogEditor.Render());
+                var flatsCatalogEditor = new CatalogEditor(PersistedFlatsCatalog.Get(), FlatsHelper.GetPreview,
+                    RMBModManager.GetCustomCatalogFlats);
+                contentContainer.Add(flatsCatalogEditor);
             });
 
             fileMenu.menu.AppendAction("Settings/Catalogs/Buildings", action =>
@@ -233,7 +232,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 Selection.SetActiveObjectWithContext(null, null);
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
-                contentContainer.Add(buildingsCatalogEditor.Render());
+                contentContainer.Add(new BuildingsCatalogEditor());
             });
 
             var editMenu = rootVisualElement.Query<ToolbarMenu>("rmb-edit-menu").First();

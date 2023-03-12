@@ -13,13 +13,24 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
 {
     public class CatalogItemElement : VisualElement
     {
+        public CatalogItem Item;
+        public Action<CatalogItem> saveItem;
+        public Action removeItem;
+
+        public event Action<CatalogItem> OnSaveItem
+        {
+            add => saveItem += value;
+            remove => saveItem -= value;
+        }
+
+        public event Action OnRemoveItem
+        {
+            add => removeItem += value;
+            remove => removeItem -= value;
+        }
         public new class UxmlFactory : UxmlFactory<CatalogItemElement, UxmlTraits>
         {
         }
-
-        public CatalogItem Item;
-        public Action<CatalogItem> SubmitItem { get; set; }
-        public Action RemoveItem { get; set; }
 
         public CatalogItem GetItem() => Item;
 
@@ -72,12 +83,16 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             var tags = this.Query<TextField>("tags").First();
 
             var newItem = new CatalogItem(idElement.value, label.value, category.value, subcategory.value, tags.value);
-            SubmitItem(newItem);
+            saveItem(newItem);
         }
 
         private void HandleRemove(MouseUpEvent e)
         {
-            RemoveItem();
+            var confirmed = EditorUtility.DisplayDialog("Remove Item?",
+                "You are about to remove this item from the catalog! Are you sure?", "Yes",
+                "No");
+            if (!confirmed) return;
+            removeItem();
         }
     }
 }

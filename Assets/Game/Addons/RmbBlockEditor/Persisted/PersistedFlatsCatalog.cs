@@ -13,7 +13,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private const string SettingsDirectory = "/Editor/Settings/RmbBlockEditor/";
         private const string SettingsFileName = "flats-catalog.json";
         private const string DefaultCatalogPath =
-            "/Assets/Game/Addons/RmbBlockEditor/Editor/Catalogs/FlatsCatalogEditor/DefaultFlatsCatalog.json";
+            "/Assets/Game/Addons/RmbBlockEditor/Persisted/DefaultFlatsCatalog.json";
 
         private PersistedFlatsCatalog()
         {

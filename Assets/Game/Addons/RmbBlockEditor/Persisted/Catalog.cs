@@ -55,18 +55,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             catch (Exception error)
             {
                 // The file does not exist, so save the default catalog
-                var path = Environment.CurrentDirectory + this.DefaultCatalogPath;
-                try
-                {
-                    var catalogJson = File.ReadAllText(path);
-                    this._list = JsonConvert.DeserializeObject<List<CatalogItem>>(catalogJson);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(e);
-                }
-
-                Save();
+                RestoreDefaults();
             }
         }
 
@@ -80,10 +69,44 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             writer.Close();
         }
 
+        public void RestoreDefaults()
+        {
+            var path = Environment.CurrentDirectory + this.DefaultCatalogPath;
+            try
+            {
+                var catalogJson = File.ReadAllText(path);
+                this._list = JsonConvert.DeserializeObject<List<CatalogItem>>(catalogJson);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+
+            Save();
+        }
+
         // setters
         public void Set(List<CatalogItem> list)
         {
-            this._list = list;
+            _list = list;
+            Save();
+        }
+
+        public void AddItem(CatalogItem item)
+        {
+            _list.Add(item);
+            Save();
+        }
+
+        public void ReplaceItem(int index, CatalogItem item)
+        {
+            _list[index] = item;
+            Save();
+        }
+
+        public void RemoveItemAt(int index)
+        {
+            _list.RemoveAt(index);
             Save();
         }
 

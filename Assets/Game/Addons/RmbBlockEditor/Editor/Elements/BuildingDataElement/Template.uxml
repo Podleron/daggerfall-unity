@@ -5,11 +5,11 @@
 >
     <engine:VisualElement class="pb mb">
 
-        <engine:VisualElement class="row pr pb">
+        <engine:VisualElement class="row mr pb">
             <editor:IntegerField label="FactionId: " name="faction-id" class="col-4"/>
         </engine:VisualElement>
 
-        <engine:VisualElement class="row pr pb">
+        <engine:VisualElement class="row mr pb">
             <editor:EnumField label="Building Type: " name="building-type" class="col-4"/>
         </engine:VisualElement>
 
@@ -23,28 +23,31 @@
             <editor:IntegerField
                 name="quality-input"
                 readonly="true"
-                class="flex-grow"
+                class="flex-grow mr"
             />
         </engine:VisualElement>
 
         <engine:VisualElement class="splitter"/>
 
-        <engine:VisualElement class="row pt" style="justify-content: flex-end">
-            <engine:Button name="replace-from-catalog-button" tooltip="Replace Building Data From Catalog">
-                <engine:Image class="catalog-icon"/>
-            </engine:Button>
-            <engine:Button name="replace-from-file-button" tooltip="Replace Building Data From File">
-                <engine:Image class="import-icon"/>
-            </engine:Button>
+        <engine:VisualElement class="row pt mr ml">
+            <engine:Box class="flex-grow">
+                <engine:VisualElement name="exterior-thumbnail"/>
+            </engine:Box>
+            <engine:Box class="flex-grow">
+                <engine:VisualElement name="interior-thumbnail"/>
+            </engine:Box>
         </engine:VisualElement>
 
-        <engine:VisualElement class="row pt mr ml pr">
-            <engine:Box class="flex-grow">
-                <engine:VisualElement name="exterior-thumbnail" />
-            </engine:Box>
-            <engine:Box class="flex-grow">
-                <engine:VisualElement name="interior-thumbnail" />
-            </engine:Box>
+        <engine:VisualElement class="splitter"/>
+
+        <engine:VisualElement class="pt pb ml mr">
+            <engine:VisualElement class="center mb">
+                <engine:Label text="Choose a new building:" class="col-4"/>
+            </engine:VisualElement>
+            <engine:VisualElement class="row mt center">
+                <engine:Button name="replace-from-catalog-button" text="Import From Catalog" class="col-2"/>
+                <engine:Button name="replace-from-file-button" text="Import From File" class="col-2"/>
+            </engine:VisualElement>
         </engine:VisualElement>
 
         <engine:VisualElement name="replace-from-file-container" class="pt hidden">
