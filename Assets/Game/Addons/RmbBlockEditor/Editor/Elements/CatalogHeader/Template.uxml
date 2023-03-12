@@ -3,7 +3,9 @@
 
     <engine:Box class="pb pt pl pr">
         <engine:VisualElement class="row pr pt">
-            <engine:Label name="catalog-title" class="h3 flex-grow"/>
+            <engine:VisualElement class="row flex-grow">
+                <engine:Label name="catalog-title" class="h3"/>
+            </engine:VisualElement>
             <engine:VisualElement class="row flex-grow right">
                 <engine:Button name="import" tooltip="Import Catalog">
                     <engine:Image class="import-icon"/>

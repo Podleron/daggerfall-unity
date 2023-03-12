@@ -5,15 +5,8 @@
     xsi:schemaLocation="DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements"
     xmlns:rbe="DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements"
 >
-    <engine:VisualElement class="row center pr pt pb">
-        <engine:Label text="Flats Catalog Editor" class="h1 shrink"/>
-        <engine:Button name="catalog-info" text="?" class="shrink"/>
-    </engine:VisualElement>
-
-    <engine:VisualElement name="catalog-header" />
-
+    <engine:VisualElement name="catalog-header" class="mt mr mb ml"/>
     <engine:VisualElement name="object-picker" usage-hints="GroupTransform" class="pb"/>
-
     <engine:Box name="options-box" class= "ml mb mr mt pt pb pl pr hidden">
         <rbe:CatalogItemElement name="catalog-item-element"/>
     </engine:Box>

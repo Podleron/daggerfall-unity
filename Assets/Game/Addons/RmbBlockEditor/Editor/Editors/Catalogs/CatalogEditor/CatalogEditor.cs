@@ -22,9 +22,11 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private int selectedIndex;
         private Func<string, VisualElement> GetPreview;
         private Func<List<CatalogItem>> GetCustomAssets;
+        private string title;
 
-        public CatalogEditor(Catalog catalog, Func<string, VisualElement> GetPreview, Func<List<CatalogItem>> GetCustomAssets)
+        public CatalogEditor(string title, Catalog catalog, Func<string, VisualElement> GetPreview, Func<List<CatalogItem>> GetCustomAssets)
         {
+            this.title = title;
             this.catalog = catalog;
             this.GetPreview = GetPreview;
             this.GetCustomAssets = GetCustomAssets;
@@ -49,7 +51,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private void InitializeCatalogHeader()
         {
             var catalogHeader = this.Query<VisualElement>("catalog-header").First();
-            var header = new CatalogHeader(catalog, GetCustomAssets, "Flats Catalog");
+            var header = new CatalogHeader(catalog, GetCustomAssets, title);
 
             header.OnCatalogUpdated += HandleCatalogUpdate;
             catalogHeader.Add(header);

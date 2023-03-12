@@ -209,8 +209,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 Selection.SetActiveObjectWithContext(null, null);
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
-                var modelsCatalogEditor = new CatalogEditor(PersistedModelsCatalog.Get(), ModelsHelper.GetPreview,
-                    RMBModManager.GetCustomCatalogModels);
+                var modelsCatalogEditor = new CatalogEditor(
+                    "3D Models Catalog",
+                    PersistedModelsCatalog.Get(),
+                    ModelsHelper.GetPreview,
+                    RMBModManager.GetCustomCatalogModels
+                );
 
                 contentContainer.Add(modelsCatalogEditor);
             });
@@ -221,8 +225,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                 Selection.SetActiveObjectWithContext(null, null);
                 var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
                 contentContainer.Clear();
-                var flatsCatalogEditor = new CatalogEditor(PersistedFlatsCatalog.Get(), FlatsHelper.GetPreview,
-                    RMBModManager.GetCustomCatalogFlats);
+                var flatsCatalogEditor = new CatalogEditor(
+                    "Flats Catalog",
+                    PersistedFlatsCatalog.Get(),
+                    FlatsHelper.GetPreview,
+                    RMBModManager.GetCustomCatalogFlats
+                );
                 contentContainer.Add(flatsCatalogEditor);
             });
 

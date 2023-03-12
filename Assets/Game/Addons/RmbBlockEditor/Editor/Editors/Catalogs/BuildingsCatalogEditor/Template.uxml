@@ -9,7 +9,6 @@
     <engine:Box class="ml mb mr mt pt pb pl pr">
         <engine:VisualElement class="row pr pt">
             <engine:VisualElement class="row flex-grow">
-                <engine:Button name="catalog-info" text="?" class="shrink"/>
                 <engine:Label text="Buildings Catalog" class="h3"/>
             </engine:VisualElement>
             <engine:VisualElement class="row flex-grow right">

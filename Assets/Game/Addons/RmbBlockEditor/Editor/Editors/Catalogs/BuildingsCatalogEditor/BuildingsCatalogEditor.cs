@@ -34,7 +34,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             catalog = PersistedBuildingsCatalog.Get();
             RenderTemplate();
             InitializeCatalogItemElement();
-            BindInfoButton();
             BindCatalogOperations();
             RenderPicker();
         }
@@ -64,16 +63,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             buildingDataElement.changed -= OnChangeBuildingData;
             buildingDataElement.changed += OnChangeBuildingData;
             buildingDataElement.HideCatalogImport();
-        }
-
-        private void BindInfoButton()
-        {
-            var infoButton = this.Query<Button>("catalog-info").First();
-            infoButton.RegisterCallback<MouseUpEvent>(evt => EditorUtility.DisplayDialog("Buildings Catalog Editor",
-                "Here you can see the catalog of buildings that you can use in the RMB block editor, when adding or modifying buildings in the scene. " +
-                "\n\nThis screen lets you change what buildings are included by importing catalog files or by editing the items by hand. " +
-                "You can also organize the items in categories and subcategories, and you can assign some tags to each item, for easy searching. " +
-                "\n\nIn addition, you can export a catalog file, to share with others.", "OK"));
         }
 
         private void BindCatalogOperations()
