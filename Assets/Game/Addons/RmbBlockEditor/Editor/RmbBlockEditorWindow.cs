@@ -101,43 +101,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             fileLoaded = false;
         }
 
-        private void OnModify3d(uint modelId)
-        {
-            var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
-            contentContainer.Clear();
-            var modify3dEditor = new ModifyMisc3dEditor(Selection.activeGameObject, modelId);
-            contentContainer.Add(modify3dEditor.Render());
-        }
-
-        private void OnModifyFlat(string flatId)
-        {
-            var contentContainer = rootVisualElement.Query<VisualElement>("content").First();
-            contentContainer.Clear();
-            var modifyFlatEditor = new ModifyMiscFlatEditor(Selection.activeGameObject, flatId);
-            contentContainer.Add(modifyFlatEditor.Render());
-        }
-
-        private void OnExportBuilding()
-        {
-            var rmbBlockObject = root.GetComponent<RmbBlockObject>();
-            var selectedBuildingGo = Selection.activeGameObject;
-            var selectedBuilding = selectedBuildingGo.GetComponent<Building>();
-            var buildingsGo = selectedBuildingGo.transform.parent;
-
-            var index = 0;
-            for (var i = 0; i < buildingsGo.transform.childCount; i++)
-            {
-                if (buildingsGo.transform.GetChild(i).gameObject == selectedBuildingGo)
-                {
-                    index = i;
-                }
-            }
-
-            var fileName = string.Format("{0}-{1}-building{2}", rmbBlockObject.Name, rmbBlockObject.Index, index);
-            var path = EditorUtility.SaveFilePanel("Save as", WorldDataFolder, fileName, "json");
-            selectedBuilding.Export(path);
-        }
-
         private void OnSelectionChange()
         {
             DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
@@ -212,7 +175,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var misc3dObjects = Selection.activeGameObject.GetComponent<Misc3d>();
             if (misc3dObjects)
             {
-                contentContainer.Add(Misc3dEditor.Render(misc3dObjects.gameObject, OnModify3d));
+                contentContainer.Add(Misc3dEditor.Render(misc3dObjects.gameObject));
                 return;
             }
 
@@ -220,7 +183,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var miscFlatObject = Selection.activeGameObject.GetComponent<MiscFlat>();
             if (miscFlatObject)
             {
-                contentContainer.Add(MiscFlatEditor.Render(miscFlatObject.gameObject, OnModifyFlat));
+                contentContainer.Add(MiscFlatEditor.Render(miscFlatObject.gameObject));
                 return;
             }
 

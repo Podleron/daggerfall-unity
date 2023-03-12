@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -17,10 +18,11 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
     public static class Misc3dEditor
     {
-        public static VisualElement Render(GameObject go, Action<uint> modify3d)
+        public static VisualElement Render(GameObject go)
         {
             // Get serialized properties:
             var misc3d = go.GetComponent<Misc3d>();
+            var id = misc3d.ModelId.ToString();
             var so = new SerializedObject(misc3d);
             var modelIdProperty = so.FindProperty("ModelId");
             var objectTypeProperty = so.FindProperty("ObjectType");
@@ -42,79 +44,26 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var rotField = misc3dPropsElement.Query<Vector3Field>("rot").First();
             var scaleField = misc3dPropsElement.Query<FloatField>("scale").First();
 
-            var modelIdInCategoryField = misc3dPropsElement.Query<Label>("model-id-in-subcategory").First();
-            var previous = misc3dPropsElement.Query<Button>("previous-model").First();
-            var next = misc3dPropsElement.Query<Button>("next-model").First();
-            var modify = misc3dPropsElement.Query<Button>("modify-model").First();
-
             // Bind the fields to the properties:
             modelIdField.BindProperty(modelIdProperty);
-            modelIdInCategoryField.BindProperty(modelIdProperty);
             objectTypeField.BindProperty(objectTypeProperty);
             posField.BindProperty(posProperty);
             rotField.BindProperty(rotProperty);
             scaleField.BindProperty(scaleProperty);
 
-            // Find the subcategory of the item
-            var itemById = PersistedModelsCatalog.ItemsDictionary();
-            var subcategories = PersistedModelsCatalog.SubcatalogDictionary();
-            var id = misc3d.ModelId.ToString();
-            if (itemById.ContainsKey(id))
-            {
-                var item = itemById[id];
-                var subcategory = subcategories[item.Subcategory].ToList();
-                var indexInCategory = subcategory.FindIndex(s => s == id);
+            var catalog = PersistedModelsCatalog.Get();
 
-                // Show subcategory label
-                var subcategoryLabel = misc3dPropsElement.Query<Label>("model-subcategory").First();
-                var isRoot = item.Subcategory.Contains("_root");
-                var labelToShow = isRoot ? item.Category : $"{item.Category}/{item.Subcategory}";
-                subcategoryLabel.text = labelToShow;
-
-                previous.RegisterCallback<MouseUpEvent>(evt =>
-                {
-                    var previousIndex = indexInCategory != 0 ? indexInCategory - 1 : 0;
-                    var previousItemId = subcategory[previousIndex];
-                    ChangeId(previousItemId, go);
-                });
-
-                next.RegisterCallback<MouseUpEvent>(evt =>
-                {
-                    var nextIndex = indexInCategory != subcategory.Count - 1 ? indexInCategory + 1 : subcategory.Count - 1;
-                    var nextItemId = subcategory[nextIndex];
-                    ChangeId(nextItemId, go);
-                });
-            }
-
-            modify.RegisterCallback<MouseUpEvent>(evt =>
-            {
-                var currentMisc3d = go.GetComponent<Misc3d>();
-                modify3d(currentMisc3d.ModelId);
-            });
+            var modifyCatalogObject = new ModifyCatalogObject(catalog, GetPreview, id);
+            modifyCatalogObject.changed += (newId) => { misc3d.ChangeId(newId); };
+            misc3dPropsElement.Add(modifyCatalogObject);
 
             return misc3dPropsElement;
         }
 
-        private static void ChangeId(string modelId, GameObject oldGo)
+        private static VisualElement GetPreview(string modelId)
         {
-            var currentMisc3d = oldGo.GetComponent<Misc3d>();
-            var record = currentMisc3d.GetRecord();
-            record.ModelIdNum = uint.Parse(modelId);
-            record.ModelId = modelId;
-
-            try
-            {
-                var newGo = RmbBlockHelper.Add3dObject(record);
-                newGo.transform.parent = oldGo.transform.parent;
-                newGo.AddComponent<Misc3d>().CreateObject(record);
-
-                Object.DestroyImmediate(oldGo);
-                Selection.SetActiveObjectWithContext(newGo, null);
-            }
-            catch (Exception error)
-            {
-                Debug.LogError(error);
-            }
+            var previewObject = RmbBlockHelper.Add3dObject(modelId);
+            return new GoPreview(previewObject);
         }
     }
 }

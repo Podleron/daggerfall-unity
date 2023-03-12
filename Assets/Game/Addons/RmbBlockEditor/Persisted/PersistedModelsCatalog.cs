@@ -16,6 +16,11 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private static readonly Catalog _catalog = new Catalog(SettingsDirectory, SettingsFileName,
             DefaultCatalogPath);
 
+
+        public static Catalog Get()
+        {
+            return _catalog;
+        }
         public static void Load()
         {
             _catalog.Load();

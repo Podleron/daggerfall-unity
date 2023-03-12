@@ -67,6 +67,27 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             return record;
         }
 
+        public void ChangeId(string modelId)
+        {
+            var record = GetRecord();
+            record.ModelIdNum = uint.Parse(modelId);
+            record.ModelId = modelId;
+
+            try
+            {
+                var newGo = RmbBlockHelper.Add3dObject(record);
+                newGo.transform.parent = gameObject.transform.parent;
+                newGo.AddComponent<Misc3d>().CreateObject(record);
+
+                DestroyImmediate(gameObject);
+                Selection.SetActiveObjectWithContext(newGo, null);
+            }
+            catch (Exception error)
+            {
+                Debug.LogError(error);
+            }
+        }
+
         private void Update()
         {
             UpdateTransform();

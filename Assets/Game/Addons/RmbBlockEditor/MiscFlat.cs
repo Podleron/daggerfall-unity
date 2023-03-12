@@ -73,6 +73,31 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             return record;
         }
 
+        public void ChangeId(string flatId)
+        {
+            var record = GetRecord();
+
+            var dot = Char.Parse(".");
+            var splitId = flatId.Split(dot);
+
+            record.TextureArchive = int.Parse(splitId[0]);
+            record.TextureRecord = int.Parse(splitId[1]);
+
+            try
+            {
+                var newGo = RmbBlockHelper.AddFlatObject(flatId);
+                newGo.transform.parent = gameObject.transform.parent;
+                newGo.AddComponent<MiscFlat>().CreateObject(record);
+
+                DestroyImmediate(gameObject);
+                Selection.SetActiveObjectWithContext(newGo, null);
+            }
+            catch (Exception error)
+            {
+                Debug.LogError(error);
+            }
+        }
+
         private void Update()
         {
             // Object position has been changed in the editor fields

@@ -88,7 +88,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             SubRecord.Interior = subRecord.Interior;
 
             // A new GameObject needs to be added to the scene with the new Exterior
-            var newGo = new GameObject("Building Replacement");
+            var newGo = new GameObject(gameObject.name);
             var newBuilding = newGo.AddComponent<Building>();
             newBuilding.CreateObject(GetBuildingData(), GetSubRecord());
             newGo.transform.parent = gameObject.transform.parent;
