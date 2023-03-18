@@ -49,6 +49,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void OnEnable()
         {
+            RMBModManager.LoadPackagedMods();
+            RMBModManager.LoadDevModInfos();
+
             PersistedSettings.Load();
             PersistedModelsCatalog.Load();
             PersistedFlatsCatalog.Load();

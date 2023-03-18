@@ -100,7 +100,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             data.TextureArchive = int.Parse(splitId[0]);
             data.TextureRecord = int.Parse(splitId[1]);
             data.XPos = (int)position.x;
-            data.YPos = (int)position.y;
+            data.YPos = (int)position.y - 2;
             data.ZPos = (int)position.z;
 
             var gameObject = RmbBlockHelper.AddFlatObject(flatId);
