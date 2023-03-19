@@ -240,6 +240,9 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var subFile = DevModModelPaths[id];
             var asset = AssetDatabase.LoadAssetAtPath<GameObject>(subFile);
             var go = Object.Instantiate(asset);
+            var goTransform = go.GetComponent<Transform>();
+            goTransform.position = Vector3.zero;
+            goTransform.localPosition = Vector3.zero;
             go.name = $"Custom Daggerfall Mesh [ID={id}]";
             var runtimeMaterial = go.GetComponent<RuntimeMaterials>();
             var renderer = go.GetComponent<Renderer>();

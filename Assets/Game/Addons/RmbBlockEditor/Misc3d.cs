@@ -13,7 +13,7 @@ using UnityEditor;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     [ExecuteInEditMode]
     [SelectionBase]
     public class Misc3d : MonoBehaviour
@@ -25,6 +25,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private Vector3 oldPos;
         public Vector3 rotation;
         public Vector3 oldRotation;
+        public Vector3 meshScale;
 
         public float scale;
         private float scaleOld;
@@ -35,6 +36,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             ObjectType = data.ObjectType;
             pos = new Vector3(data.XPos, data.YPos, data.ZPos);
             rotation = new Vector3(data.XRotation, data.YRotation, data.ZRotation);
+            meshScale = transform.localScale;
             scale = data.YScale;
 
             SaveOldRotation();
@@ -107,9 +109,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             rotation = new Vector3(rotationX, rotationY, rotationZ);
 
             SaveOldScale();
-            scale = transform.localScale.x;
-            scale = transform.localScale.y;
-            scale = transform.localScale.z;
+            scale = transform.localScale.x / meshScale.x;
 
             SaveOldPosition();
             var xPos = (int)Math.Round(transform.position.x / MeshReader.GlobalScale);
@@ -180,7 +180,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void UpdateSceneScale()
         {
-            transform.localScale = new Vector3(scale, scale, scale);
+            transform.localScale = new Vector3(scale * meshScale.x, scale * meshScale.y, scale * meshScale.z);
         }
 
         private void OnDestroy()
@@ -188,5 +188,5 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             SceneView.duringSceneGui -= OnSceneGUI;
         }
     }
-    #endif
+#endif
 }
