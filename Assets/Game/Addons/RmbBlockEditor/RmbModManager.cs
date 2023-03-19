@@ -25,11 +25,12 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         static Dictionary<string, ModInfo> PackagedModInfo;
         static Dictionary<string, HashSet<string>> PackagedModelIds;
-        static Dictionary<string, HashSet<string>> PackagedTextureIds;
+        static Dictionary<string, HashSet<string>> PackagedBillboardIds;
 
-        static Dictionary<string, Component[]> PackagedModels;
-        static Dictionary<string, Texture2D> PackagedTextures;
-        static Dictionary<string, TextAsset> PackagedXmls;
+        private static Dictionary<string, string> PackagedModFilePaths;
+        private static Dictionary<string, string> PackagedModModelPaths;
+        private static Dictionary<string, string> PackagedModBillboardImagePaths;
+        private static Dictionary<string, string> PackagedModBillboardXmlPaths;
 
         private static Dictionary<string, string> DevModModelPaths;
         private static Dictionary<string, string> DevModBillboardImagePaths;
@@ -57,8 +58,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
                 foreach (var subFile in modInfo.Files)
                 {
-                    var isCustomModel = subFile.EndsWith(".obj") || subFile.EndsWith(".fbx") ||
-                                        subFile.EndsWith(".prefab");
+                    var isCustomModel = IsCustomModel(subFile);
                     var isCustomBillboard = IsCustomBillboardImage(subFile);
                     var isCustomXml = IsCustomBillboardXML(subFile);
 
@@ -122,36 +122,47 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
                     if (ModManager._serializer.TryDeserialize(fsJsonParser.Parse(dfmodAsset.text), ref modInfo).Failed)
                         continue;
 
+                    PackagedModFilePaths.Add(modInfo.ModTitle, file);
+
                     var modelIds = new HashSet<string>();
                     var flatIds = new HashSet<string>();
 
                     foreach (var subFile in modInfo.Files)
                     {
                         var fileName = Path.GetFileNameWithoutExtension(subFile);
-                        if (IsCustomModel(subFile))
+                        var isCustomModel = IsCustomModel(subFile);
+                        var isCustomBillboard = IsCustomBillboardImage(subFile);
+                        var isCustomXml = IsCustomBillboardXML(subFile);
+
+                        if (isCustomModel)
                         {
                             modelIds.Add(fileName);
-                            var go = bundle.LoadAsset<GameObject>(subFile);
-                            var meshFilter = go.GetComponent<MeshFilter>();
-                            var meshRenderer = go.GetComponent<MeshRenderer>();
-                            PackagedModels.Add(fileName, new Component[] { meshFilter, meshRenderer });
+                            if (!PackagedModModelPaths.ContainsKey(fileName))
+                            {
+                                PackagedModModelPaths.Add(fileName, subFile);
+                            }
                         }
-                        else if (IsCustomBillboardImage(subFile))
+                        else if (isCustomBillboard)
                         {
                             var id = FileToBillboardId(fileName);
                             flatIds.Add(id);
-                            PackagedTextures.Add(fileName, bundle.LoadAsset<Texture2D>(subFile));
+                            if (!PackagedModBillboardImagePaths.ContainsKey(fileName))
+                            {
+                                PackagedModBillboardImagePaths.Add(fileName, subFile);
+                            }
                         }
-                        else if (IsCustomBillboardXML(subFile))
+                        else if (isCustomXml)
                         {
-                            var xml = bundle.LoadAsset<TextAsset>(subFile);
-                            PackagedXmls.Add(fileName, xml);
+                            if (!PackagedModBillboardXmlPaths.ContainsKey(fileName))
+                            {
+                                PackagedModBillboardXmlPaths.Add(fileName, subFile);
+                            }
                         }
                     }
 
                     PackagedModInfo.Add(modInfo.ModTitle, modInfo);
                     PackagedModelIds.Add(modInfo.ModTitle, modelIds);
-                    PackagedTextureIds.Add(modInfo.ModTitle, flatIds);
+                    PackagedBillboardIds.Add(modInfo.ModTitle, flatIds);
                 }
                 catch (Exception err)
                 {
@@ -203,7 +214,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
             foreach (var mod in packagedMods)
             {
-                var flats = PackagedTextureIds[mod];
+                var flats = PackagedBillboardIds[mod];
                 foreach (var id in flats)
                 {
                     allIds.Add(new CatalogItem(id, id, "Mods", mod));
@@ -278,64 +289,120 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private static GameObject GetPackagedModModel(string id)
         {
-            var components = PackagedModels.ContainsKey(id) ? PackagedModels[id] : null;
-            if (components == null) return null;
+            // Find the mod that this model belongs to
+            string modName = null;
+            foreach (var key in PackagedModelIds.Keys.Where(key => PackagedModelIds[key].Contains(id)))
+            {
+                modName = key;
+            }
 
+            if (modName == null)
+            {
+                return null;
+            }
+
+            // Get the file path of the mod
+            var fileName = PackagedModFilePaths[modName];
+
+            AssetBundle bundle = null;
             try
             {
-                var go = new GameObject($"Custom DaggerfallMesh [ID={id}]");
-                var savedMeshFilter = components[0] as MeshFilter;
-                var savedMeshRenderer = components[1] as MeshRenderer;
+                // Load the mod bundle
+                bundle = AssetBundle.LoadFromFile(fileName);
 
-                var meshFilter = go.AddComponent<MeshFilter>();
-                var meshRenderer = go.AddComponent<MeshRenderer>();
+                // Find and load the asset
+                var subFile = PackagedModModelPaths[id];
+                var asset = bundle.LoadAsset<GameObject>(subFile);
 
-                meshFilter.sharedMesh = savedMeshFilter.sharedMesh;
-                meshRenderer.sharedMaterial = savedMeshRenderer.sharedMaterial;
+                // Create a game object from the asset
+                var go = Object.Instantiate(asset);
+                go.name = $"Custom DaggerfallMesh [ID={id}]";
 
+                // Unload the bundle and return the game object
+                bundle.Unload(false);
                 return go;
             }
             catch (Exception err)
             {
                 Debug.Log(err);
+                if (bundle != null)
+                {
+                    bundle.Unload(false);
+                }
+                return null;
             }
-
-            return null;
         }
 
-        public static GameObject GetPackagedModBillboard(string id)
+        private static GameObject GetPackagedModBillboard(string id)
         {
             var parts = id.Split('.');
-            var fileName = TextureReplacement.GetName(int.Parse(parts[0]), int.Parse(parts[1]));
-            Texture2D texture = null;
-            if (PackagedTextures.ContainsKey(fileName))
+            var billboardName = TextureReplacement.GetName(int.Parse(parts[0]), int.Parse(parts[1]));
+
+            // Find the mod that this billboard belongs to
+            string modName = null;
+            foreach (var key in PackagedBillboardIds.Keys.Where(key => PackagedBillboardIds[key].Contains(id)))
             {
-                texture = PackagedTextures[fileName];
+                modName = key;
             }
 
-            var scale = Vector2.one;
-            if (PackagedXmls.ContainsKey(fileName))
-            {
-                scale = GetScale(PackagedXmls[fileName]);
-            }
-
-            if (texture == null)
+            if (modName == null)
             {
                 return null;
             }
 
-            var go = new GameObject($"Custom Billboard {id}");
-            var x = texture.width * scale.x * MeshReader.GlobalScale;
-            var y = texture.height * scale.y * MeshReader.GlobalScale;
+            // Get the file path of the mod
+            var fileName = PackagedModFilePaths[modName];
 
-            var newScale = new Vector2(x, y);
-            var billboard = go.AddComponent<DaggerfallBillboard>();
-            billboard.SetMaterial(texture, newScale);
+            AssetBundle bundle = null;
+            try
+            {
+                // Load the mod bundle
+                bundle = AssetBundle.LoadFromFile(fileName);
 
-            return go;
+                // Find and load the image
+                var textureSubFile = PackagedModBillboardImagePaths[billboardName];
+                var texture = bundle.LoadAsset<Texture2D>(textureSubFile);
+
+                // Find and load xml
+                TextAsset xml = null;
+                if (PackagedModBillboardXmlPaths.ContainsKey(billboardName))
+                {
+                    var xmlSubFile = PackagedModBillboardXmlPaths[billboardName];
+                    xml = bundle.LoadAsset<TextAsset>(xmlSubFile);
+                }
+
+                // Set the scale of the texture
+                var scale = Vector2.one;
+                if (xml != null)
+                {
+                    scale = GetScale(xml);
+                }
+                var x = texture.width * scale.x * MeshReader.GlobalScale;
+                var y = texture.height * scale.y * MeshReader.GlobalScale;
+                var newScale = new Vector2(x, y);
+
+
+                // Create the game object and add the DaggerfallBillboard component
+                var go = new GameObject($"Custom Billboard {id}");
+                var billboard = go.AddComponent<DaggerfallBillboard>();
+                billboard.SetMaterial(texture, newScale);
+
+                // Unload the bundle and return the game object
+                bundle.Unload(false);
+                return go;
+            }
+            catch (Exception err)
+            {
+                Debug.Log(err);
+                if (bundle != null)
+                {
+                    bundle.Unload(false);
+                }
+                return null;
+            }
         }
 
-        public static GameObject GetDevModBillboard(string id)
+        private static GameObject GetDevModBillboard(string id)
         {
             // Get the file id
             var parts = id.Split('.');
@@ -371,13 +438,14 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private static void InstantiatePackagedModsDictionaries()
         {
+            PackagedModFilePaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             PackagedModInfo = new Dictionary<string, ModInfo>(StringComparer.OrdinalIgnoreCase);
             PackagedModelIds = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-            PackagedTextureIds = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            PackagedBillboardIds = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-            PackagedModels = new Dictionary<string, Component[]>(StringComparer.OrdinalIgnoreCase);
-            PackagedTextures = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
-            PackagedXmls = new Dictionary<string, TextAsset>(StringComparer.OrdinalIgnoreCase);
+            PackagedModModelPaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            PackagedModBillboardImagePaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            PackagedModBillboardXmlPaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
         private static void InstantiateDevModDictionaries()
