@@ -69,7 +69,7 @@
             <engine:VisualElement class="splitter"/>
             <engine:Label text="Import Building Data From Catalog" class="h3 center"/>
 
-            <engine:VisualElement name="object-picker-container" class="mb"/>
+            <engine:VisualElement name="object-picker-container" class="mb mt"/>
 
             <engine:VisualElement class="row ml mr mt pt pb">
                 <engine:Toggle name="import-props-from-catalog" text="Properties" value="true" class="flex-grow mr"/>

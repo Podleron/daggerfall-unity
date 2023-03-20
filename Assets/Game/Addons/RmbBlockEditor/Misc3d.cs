@@ -36,8 +36,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             ObjectType = data.ObjectType;
             pos = new Vector3(data.XPos, data.YPos, data.ZPos);
             rotation = new Vector3(data.XRotation, data.YRotation, data.ZRotation);
-            meshScale = transform.localScale;
-            scale = data.YScale;
+            scale = data.XScale;
+            meshScale = transform.localScale / scale;
 
             SaveOldRotation();
             SaveOldPosition();
