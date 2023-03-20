@@ -39,15 +39,13 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         {
             try
             {
-                StreamReader reader = new StreamReader(this.filePath);
+                StreamReader reader = new StreamReader(filePath);
                 var data = reader.ReadToEnd();
                 try
                 {
                     var deserialized = JsonConvert.DeserializeObject<Catalog>(data);
-                    this._list = deserialized._list;
-                    GenerateCatalogDictionaries(this._list, ref this._items,
-                        ref this._subcategories,
-                        ref this._categories);
+                    _list = deserialized._list;
+                    GenerateCatalogDictionaries(_list, ref _items, ref _subcategories, ref _categories);
                 }
                 catch (Exception error)
                 {
@@ -68,21 +66,23 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         public void Save()
         {
-            Directory.CreateDirectory(this.directoryPath);
-            var writer = File.CreateText(this.filePath);
+            Directory.CreateDirectory(directoryPath);
+            var writer = File.CreateText(filePath);
             var fileContent = JsonConvert.SerializeObject(this);
 
             writer.Write(fileContent);
             writer.Close();
+
+            GenerateCatalogDictionaries(_list, ref _items, ref _subcategories, ref _categories);
         }
 
         public void RestoreDefaults()
         {
-            var path = Environment.CurrentDirectory + this.DefaultCatalogPath;
+            var path = Environment.CurrentDirectory + DefaultCatalogPath;
             try
             {
                 var catalogJson = File.ReadAllText(path);
-                this._list = JsonConvert.DeserializeObject<List<CatalogItem>>(catalogJson);
+                _list = JsonConvert.DeserializeObject<List<CatalogItem>>(catalogJson);
             }
             catch (Exception e)
             {
@@ -120,28 +120,31 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         // getters
         public List<CatalogItem> List()
         {
-            return this._list;
+            return _list;
         }
 
         public Dictionary<string, CatalogItem> ItemsDictionary()
         {
-            return this._items;
+            return _items;
         }
 
         public Dictionary<string, HashSet<string>> SubcatalogDictionary()
         {
-            return this._subcategories;
+            return _subcategories;
         }
 
         public Dictionary<string, HashSet<string>> CatalogDictionary()
         {
-            return this._categories;
+            return _categories;
         }
 
         // helper
-        public static void GenerateCatalogDictionaries(List<CatalogItem> catalog,
+        public static void GenerateCatalogDictionaries(
+            List<CatalogItem> catalog,
             ref Dictionary<string, CatalogItem> catalogItems,
-            ref Dictionary<string, HashSet<string>> subcategories, ref Dictionary<string, HashSet<string>> categories)
+            ref Dictionary<string, HashSet<string>> subcategories,
+            ref Dictionary<string, HashSet<string>> categories
+        )
         {
             catalogItems = new Dictionary<string, CatalogItem>();
             subcategories = new Dictionary<string, HashSet<string>>();

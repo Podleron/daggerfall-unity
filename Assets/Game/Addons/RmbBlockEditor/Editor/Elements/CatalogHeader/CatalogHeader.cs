@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -95,7 +95,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
         {
             var fileContent = JsonConvert.SerializeObject(catalog);
             var path = EditorUtility.SaveFilePanel("Save", WorldDataFolder, exportFile, "json");
-            if (String.IsNullOrEmpty(path) || !File.Exists(path))
+            if (String.IsNullOrEmpty(path))
             {
                 return;
             }
@@ -168,7 +168,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             return catalog1;
         }
 
-        private bool LoadFile(ref List<CatalogItem> newCatalog)
+        private bool LoadFile(ref List<CatalogItem> newCatalogList)
         {
             var path = EditorUtility.OpenFilePanel("Import catalog", WorldDataFolder, "json");
 
@@ -180,7 +180,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             try
             {
                 var catalogJson = File.ReadAllText(path);
-                newCatalog = JsonConvert.DeserializeObject<List<CatalogItem>>(catalogJson);
+                var newCatalog = JsonConvert.DeserializeObject<Catalog>(catalogJson);
+                newCatalogList = newCatalog?.List();
                 return true;
             }
             catch (ArgumentException e)

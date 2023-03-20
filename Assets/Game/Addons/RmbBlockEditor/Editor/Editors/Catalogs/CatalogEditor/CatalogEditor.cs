@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 
 namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 {
-    public class CatalogEditor: VisualElement
+    public class CatalogEditor : VisualElement
     {
         private ObjectPicker picker;
         private Catalog catalog;
@@ -24,7 +24,8 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private Func<List<CatalogItem>> GetCustomAssets;
         private string title;
 
-        public CatalogEditor(string title, Catalog catalog, Func<string, VisualElement> GetPreview, Func<List<CatalogItem>> GetCustomAssets)
+        public CatalogEditor(string title, Catalog catalog, Func<string, VisualElement> GetPreview,
+            Func<List<CatalogItem>> GetCustomAssets)
         {
             this.title = title;
             this.catalog = catalog;
@@ -81,7 +82,10 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         {
             this.objectId = objectId;
             selectedIndex = catalog.List().FindIndex(item => item.ID == objectId);
-            selectedItem = catalog.ItemsDictionary()[objectId];
+            selectedItem = selectedIndex == -1
+                ? new CatalogItem(objectId)
+                : catalog.ItemsDictionary()[objectId];
+
             var catalogItemElement = this.Query<CatalogItemElement>("catalog-item-element").First();
             catalogItemElement.SetItem(selectedItem);
 

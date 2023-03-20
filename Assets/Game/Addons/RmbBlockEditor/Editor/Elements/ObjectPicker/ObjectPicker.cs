@@ -124,8 +124,17 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
             var newSelection = visualElement.Query<Button>(objectId).First();
             newSelection?.AddToClassList("selected");
 
-            var categoryFoldout = visualElement.Query<Foldout>(itemById[objectId].Category).First();
-            var subcategoryFoldout = categoryFoldout?.Query<Foldout>(itemById[objectId].Subcategory).First();
+            Foldout categoryFoldout = null;
+            if (itemById.ContainsKey(objectId))
+            {
+                categoryFoldout = visualElement.Query<Foldout>(itemById[objectId].Category).First();
+            }
+
+            Foldout subcategoryFoldout = null;
+            if (itemById.ContainsKey(objectId))
+            {
+                subcategoryFoldout = categoryFoldout?.Query<Foldout>(itemById[objectId].Subcategory).First();
+            }
 
             if (categoryFoldout != null)
             {

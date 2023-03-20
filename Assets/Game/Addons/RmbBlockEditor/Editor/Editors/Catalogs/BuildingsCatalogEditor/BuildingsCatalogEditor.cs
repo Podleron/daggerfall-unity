@@ -255,11 +255,6 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
 
         private void OnRemoveItem()
         {
-            var confirmed = EditorUtility.DisplayDialog("Remove Item?",
-                "You are about to remove this item from the catalog! Are you sure?", "Yes",
-                "No");
-            if (!confirmed) return;
-
             catalog.list.RemoveAt(selectedIndex);
             PersistedBuildingsCatalog.Set(catalog);
             OnItemDeseleted();
