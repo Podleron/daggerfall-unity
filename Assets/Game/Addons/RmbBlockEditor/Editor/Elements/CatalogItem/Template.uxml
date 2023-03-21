@@ -10,7 +10,7 @@
     </engine:VisualElement>
 
     <engine:VisualElement class="row pr pb">
-        <engine:TextField label="ID" name="id" class="col-4"/>
+        <engine:TextField readonly="true" label="ID" name="id" class="col-4"/>
     </engine:VisualElement>
 
     <engine:VisualElement class="row pr pb">

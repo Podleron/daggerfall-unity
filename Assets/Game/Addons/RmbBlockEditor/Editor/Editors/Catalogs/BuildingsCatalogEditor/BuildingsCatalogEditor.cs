@@ -53,6 +53,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor
         private void InitializeCatalogItemElement()
         {
             var catalogItemElement = this.Query<CatalogItemElement>("catalog-item-element").First();
+            catalogItemElement.readOnly = false;
             catalogItemElement.OnSaveItem += OnSaveItem;
             catalogItemElement.OnRemoveItem += OnRemoveItem;
         }

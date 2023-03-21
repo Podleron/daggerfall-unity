@@ -16,6 +16,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
         public CatalogItem Item;
         public Action<CatalogItem> saveItem;
         public Action removeItem;
+        public bool readOnly = true;
 
         public event Action<CatalogItem> OnSaveItem
         {
@@ -60,6 +61,7 @@ namespace DaggerfallWorkshop.Game.Addons.RmbBlockEditor.Elements
             var tags = this.Query<TextField>("tags").First();
 
             idElement.value = GetItem().ID;
+            idElement.isReadOnly = readOnly;
             label.value = GetItem().Label;
             category.value = GetItem().Category;
             subcategory.value = GetItem().Subcategory;
